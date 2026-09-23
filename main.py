@@ -113,4 +113,62 @@ def all_text(m):
     if t in ["Current weather","/weather"]:
         c=w['current']
         bot.send_message(m.chat.id, f"Weather at your saved location:\nTimezone: {w['timezone']}\n{weather_text(c['weather_code'])}\nTemperature: {c['temperature_2m']}°C\nFeels like: {c['apparent_temperature']}°C\nHumidity: {c['relative_humidity_2m']}%\nWind: {c['wind_speed_10m']} km/h", reply_markup=weather_kb())
-    elif t in ["7-day forecast","/
+    elif t in ["7-day forecast","/weekweather"]:
+        daily=w['daily']
+        txt=f"7-day forecast at your saved location:\nTimezone: {w['timezone']}\n"
+        for i in range(len(daily['time'])):
+            txt+=f"{daily['time'][i]}: {weather_text(daily['weather_code'][i])}, {daily['temperature_2m_min'][i]} to {daily['temperature_2m_max'][i]}°C, rain {daily['precipitation_probability_max'][i]}%, {daily['precipitation_sum'][i]} mm\n"
+        bot.send_message(m.chat.id, txt, reply_markup=weather_kb())
+    elif t in ["Hourly","/hourly"]:
+        hourly=w['hourly']
+        txt=f"Next 24 hours forecast at your saved location:\n"
+        for i in range(min(24, len(hourly['time']))):
+            txt+=f"{hourly['time'][i]}: {hourly['temperature_2m'][i]}°C, {weather_text(hourly['weather_code'][i])}, rain {hourly['precipitation_probability'][i]}%\n"
+        bot.send_message(m.chat.id, txt, reply_markup=weather_kb())
+    elif t in ["Tomorrow","/tomorrow"]:
+        d=w['daily']
+        txt=f"Tomorrow at your saved location:\n{d['time'][1]}\n{weather_text(d['weather_code'][1])}\nTemperature: {d['temperature_2m_min'][1]} to {d['temperature_2m_max'][1]} °C\nRain chance: {d['precipitation_probability_max'][1]}%\nExpected precipitation: {d['precipitation_sum'][1]} mm"
+        bot.send_message(m.chat.id, txt, reply_markup=weather_kb())
+    elif t in ["Rain forecast","/rain"]:
+        d=w['daily']
+        txt=f"Rain forecast for {d['time'][0]}:\nRain is possible today.\nMaximum chance: {d['precipitation_probability_max'][0]}%\nExpected precipitation: {d['precipitation_sum'][0]} mm"
+        bot.send_message(m.chat.id, txt, reply_markup=weather_kb())
+    elif t in ["Air quality","/air"]:
+        air=get_air(loc['lat'], loc['lon'])
+        if air and 'current' in air:
+            c=air['current']
+            txt=f"Air quality at your saved location:\nEuropean AQI: {c.get('european_aqi','-')} (Fair)\nPM2.5: {c.get('pm2_5','-')} µg/m³\nPM10: {c.get('pm10','-')} µg/m³"
+        else:
+            txt="Air quality data not available now."
+        bot.send_message(m.chat.id, txt, reply_markup=weather_kb())
+    elif t in ["UV index","/uv"]:
+        d=w['daily']
+        uv=d['uv_index_max'][0]
+        level="Low" if uv<3 else "Moderate" if uv<6 else "High"
+        bot.send_message(m.chat.id, f"UV index for today:\nMaximum UV index: {uv} ({level}).\nNormal sun protection is recommended." if uv>=3 else f"UV index for today: {uv} ({level}).", reply_markup=weather_kb())
+    elif t in ["Sun times","/sun"]:
+        d=w['daily']
+        bot.send_message(m.chat.id, f"Sun times at your saved location:\nSunrise: {d['sunrise'][0].split('T')[1]}\nSunset: {d['sunset'][0].split('T')[1]}\nTimezone: {w['timezone']}", reply_markup=weather_kb())
+    elif t in ["Wind","/wind"]:
+        c=w['current']
+        d=w['daily']
+        bot.send_message(m.chat.id, f"Wind at your saved location:\nNow: {c['wind_speed_10m']} km/h {c.get('wind_direction_10m','')}°\nToday's maximum: {d['wind_speed_10m_max'][0]} km/h\nDominant direction: {d['wind_direction_10m_dominant'][0]}°", reply_markup=weather_kb())
+    elif t in ["Weather alerts","/alerts"]:
+        prob=w['daily']['precipitation_probability_max'][0]
+        if prob>=70:
+            bot.send_message(m.chat.id, f"Weather alerts for today:\nHeavy rain is possible ({prob}% chance).", reply_markup=weather_kb())
+        else:
+            bot.send_message(m.chat.id, f"No severe alerts for today. Rain chance {prob}%.", reply_markup=weather_kb())
+    else:
+        bot.send_message(m.chat.id, "Choose an option", reply_markup=main_kb() if t not in ["Current weather","7-day forecast","Hourly","Tomorrow","Rain forecast","Air quality","UV index","Sun times","Wind","Weather alerts"] else weather_kb())
+
+app = Flask(__name__)
+@app.route('/')
+def home():
+    return "Bot is running"
+
+def run_web():
+    app.run(host='0.0.0.0', port=10000)
+
+threading.Thread(target=run_web, daemon=True).start()
+bot.infinity_polling()
