@@ -1,6 +1,6 @@
-imporfrom flask import Flask
+from flask import Flask
 import threading
-t telebot, requests, json, os
+import telebot, requests, json, os
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from telebot import types
