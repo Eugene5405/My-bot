@@ -87,7 +87,24 @@ def loc_handler(m):
 @bot.message_handler(func=lambda m: True)
 def all_text(m):
     t=m.text
-  app = Flask(__name__)
+    if t == "Back to main menu":
+        bot.send_message(m.chat.id, "Main menu", reply_markup=main_kb())
+    elif t == "Change location" or t == "Share my location":
+        bot.send_message(m.chat.id, "Please share your location", reply_markup=loc_kb())
+    elif t == "Show time" or t == "/watch":
+        loc=get_loc(m.from_user.id)
+        now=datetime.now(ZoneInfo(loc['timezone']))
+        bot.send_message(m.chat.id, f"Current time in {loc['timezone']}:\n{now.strftime('%A, %d %B %Y at %H:%M:%S')}", reply_markup=main_kb())
+    elif t == "Help":
+        bot.send_message(m.chat.id, "/watch - time\n/weather - weather", reply_markup=main_kb())
+    elif t in ["Weather commands", "Current weather", "/weather"]:
+        send_weather(m)
+    else:
+        bot.send_message(m.chat.id, "Use the menu", reply_markup=main_kb())
+
+# Flask часть - должна быть ВНЕ всех функций, у левого края
+app = Flask(__name__)
+
 @app.route('/')
 def home():
     return "Bot is running"
@@ -95,4 +112,7 @@ def home():
 def run_web():
     app.run(host='0.0.0.0', port=10000)
 
-threading.Thread(target=run_web).start()
+threading.Thread(target=run_web, daemon=True).start()
+
+print("Bot started...")
+bot.infinity_polling()
