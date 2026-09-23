@@ -5,9 +5,11 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from telebot import types
 
-TOKEN = "7627951094:AAHHVIUcojyqvHYNfdCLdpz0aYP2HDnzm-Q"
-bot = telebot.TeleBot(TOKEN)
+from dotenv import load_dotenv
+load_dotenv()
 
+TOKEN = os.getenv("TOKEN")
+bot = telebot.TeleBot(TOKEN)
 FILE = "locations.json"
 user_locations = {}
 if os.path.exists(FILE):
