@@ -5,7 +5,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from telebot import types
 
-TOKEN = "7627951094:AAFEwrJUkerL_641Zm1NHWOr5GU_meefBrA"
+TOKEN = "7627951094:AAHHVIUcojyqvHYNfdCLdpz0aYP2HDnzm-Q"
 bot = telebot.TeleBot(TOKEN)
 
 FILE = "locations.json"
