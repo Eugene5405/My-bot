@@ -4,11 +4,13 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from telebot import types
 from dotenv import load_dotenv
+
 load_dotenv()
 TOKEN=os.getenv("TOKEN")
 bot=telebot.TeleBot(TOKEN)
 bot.remove_webhook()
 time.sleep(1)
+
 FILE="locations.json"
 U={}
 if os.path.exists(FILE):
@@ -16,20 +18,21 @@ if os.path.exists(FILE):
         U=json.load(open(FILE,"r"))
     except:
         U={}
+
 def save():
     json.dump(U,open(FILE,"w"),ensure_ascii=False)
 
 LANGS={
-"en":{"name":"EN English","welcome":"Hi! I am your personal meteorologist\n\nWeather commands below","weather_btn":"Weather commands","time_btn":"Time & DST","loc_btn":"Change Location","help_btn":"Help","back":"Back","choose_lang":"Choose language:","lang_saved":"Language saved: English"},
-"ru":{"name":"RU Russian","welcome":"Privet! Ya tvoy meteorolog\n\nKomandy pogody nizhe","weather_btn":"Komandy pogody","time_btn":"Vremya i DST","loc_btn":"Smenit lokaciyu","help_btn":"Pomoshch","back":"Nazad","choose_lang":"Vyberi yazyk:","lang_saved":"Yazyk sokhranen: Russian"},
-"uk":{"name":"UA Ukrainian","welcome":"Pryvit! Ya tviy meteorolog","weather_btn":"Komandy pogody","time_btn":"Chas i DST","loc_btn":"Zminity lokaciyu","help_btn":"Dopomoga","back":"Nazad","choose_lang":"Obery movu:","lang_saved":"Mova: Ukrainian"},
+"en":{"name":"EN English","welcome":"Hi! I am your personal meteorologist\n\nWeather:\n/current - now\n/today /tomorrow /week /hourly\n/rain /wind /sun /uv /air\n\nTime:\n/time /dst\n\nPress Weather commands below\nData: Open-Meteo","weather_btn":"Weather commands","time_btn":"Time & DST","loc_btn":"Change Location","help_btn":"Help","back":"Back","choose_lang":"Choose language:","lang_saved":"Language saved: English"},
+"ru":{"name":"RU Russian","welcome":"Privet! Ya tvoy meteorolog\n\nPogoda:\n/current - seychas\n/today - segodnya\n/tomorrow - zavtra\n/week - 7 dney\n/hourly - po chasam\n/rain /wind /sun /uv /air\n\nVremya:\n/time /dst\n\nNazhmi Komandy pogody vnizu\nDannye: Open-Meteo","weather_btn":"Komandy pogody","time_btn":"Vremya i DST","loc_btn":"Smenit lokaciyu","help_btn":"Pomoshch","back":"Nazad","choose_lang":"Vyberi yazyk:","lang_saved":"Yazyk sokhranen: Russian"},
+"uk":{"name":"UA Ukrainian","welcome":"Pryvit! Ya tviy meteorolog\n\nTysny Komandy pogody","weather_btn":"Komandy pogody","time_btn":"Chas i DST","loc_btn":"Zminity lokaciyu","help_btn":"Dopomoga","back":"Nazad","choose_lang":"Obery movu:","lang_saved":"Mova zberezhena: Ukrainian"},
 "be":{"name":"BY Belarusian","welcome":"Pryvitannie! Ya tvoy meteoralag","weather_btn":"Nadvor'e","time_btn":"Chas","loc_btn":"Lakacyya","help_btn":"Dapamoga","back":"Nazad","choose_lang":"Vybery movu:","lang_saved":"Mova: Belarusian"},
-"sr":{"name":"RS Srpski","welcome":"Zdravo! Ja sam tvoj meteorolog","weather_btn":"Vreme komande","time_btn":"Vreme i DST","loc_btn":"Promeni lokaciju","help_btn":"Pomoc","back":"Nazad","choose_lang":"Izaberi jezik:","lang_saved":"Jezik: Srpski SACUVAN"},
-"pl":{"name":"PL Polski","welcome":"Czesc! Jestem twoim meteorologiem","weather_btn":"Pogoda komendy","time_btn":"Czas i DST","loc_btn":"Zmien lokalizacje","help_btn":"Pomoc","back":"Wroc","choose_lang":"Wybierz jezyk:","lang_saved":"Jezyk: Polski"},
-"de":{"name":"DE Deutsch","welcome":"Hallo! Ich bin dein Meteorologe","weather_btn":"Wetter Befehle","time_btn":"Zeit & DST","loc_btn":"Standort andern","help_btn":"Hilfe","back":"Zuruck","choose_lang":"Sprache wahlen:","lang_saved":"Sprache: Deutsch GESPEICHERT"},
-"fr":{"name":"FR Francais","welcome":"Salut! Je suis ton meteorologue","weather_btn":"Commandes meteo","time_btn":"Heure & DST","loc_btn":"Changer lieu","help_btn":"Aide","back":"Retour","choose_lang":"Choisis langue:","lang_saved":"Langue: Francais"},
-"es":{"name":"ES Espanol","welcome":"Hola! Soy tu meteorologo","weather_btn":"Comandos clima","time_btn":"Hora y DST","loc_btn":"Cambiar ubicacion","help_btn":"Ayuda","back":"Atras","choose_lang":"Elige idioma:","lang_saved":"Idioma: Espanol"},
-"it":{"name":"IT Italiano","welcome":"Ciao! Sono il tuo meteorologo","weather_btn":"Comandi meteo","time_btn":"Ora e DST","loc_btn":"Cambia posizione","help_btn":"Aiuto","back":"Indietro","choose_lang":"Scegli lingua:","lang_saved":"Lingua: Italiano"}
+"sr":{"name":"RS Srpski","welcome":"Zdravo! Ja sam tvoj meteorolog\n\nVreme:\n/current - sada\n/today - danas\n/tomorrow - sutra\n/week - 7 dana\n\nPritisni Vreme komande ispod","weather_btn":"Vreme komande","time_btn":"Vreme i DST","loc_btn":"Promeni lokaciju","help_btn":"Pomoc","back":"Nazad","choose_lang":"Izaberi jezik:","lang_saved":"Jezik sacuvan: Srpski"},
+"pl":{"name":"PL Polski","welcome":"Czesc! Jestem twoim meteorologiem\n\nNacisnij Pogoda komendy","weather_btn":"Pogoda komendy","time_btn":"Czas i DST","loc_btn":"Zmien lokalizacje","help_btn":"Pomoc","back":"Wroc","choose_lang":"Wybierz jezyk:","lang_saved":"Jezyk: Polski zapisany"},
+"de":{"name":"DE Deutsch","welcome":"Hallo! Ich bin dein Meteorologe\n\nDrucke Wetter Befehle","weather_btn":"Wetter Befehle","time_btn":"Zeit & DST","loc_btn":"Standort andern","help_btn":"Hilfe","back":"Zuruck","choose_lang":"Sprache wahlen:","lang_saved":"Sprache: Deutsch gespeichert"},
+"fr":{"name":"FR Francais","welcome":"Salut! Je suis ton meteorologue\n\nAppuie Commandes meteo","weather_btn":"Commandes meteo","time_btn":"Heure & DST","loc_btn":"Changer lieu","help_btn":"Aide","back":"Retour","choose_lang":"Choisis langue:","lang_saved":"Langue: Francais sauve"},
+"es":{"name":"ES Espanol","welcome":"Hola! Soy tu meteorologo\n\nPulsa Comandos clima","weather_btn":"Comandos clima","time_btn":"Hora y DST","loc_btn":"Cambiar ubicacion","help_btn":"Ayuda","back":"Atras","choose_lang":"Elige idioma:","lang_saved":"Idioma: Espanol guardado"},
+"it":{"name":"IT Italiano","welcome":"Ciao! Sono il tuo meteorologo\n\nPremi Comandi meteo","weather_btn":"Comandi meteo","time_btn":"Ora e DST","loc_btn":"Cambia posizione","help_btn":"Aiuto","back":"Indietro","choose_lang":"Scegli lingua:","lang_saved":"Lingua: Italiano salvata"}
 }
 
 def get_user(uid):
@@ -103,12 +106,18 @@ def loc_kb(uid):
     k.add(tr(uid,"back"))
     return k
 
+# САМОЕ НАЧАЛО - ВЫБОР ЯЗЫКА
 @bot.message_handler(commands=["start","help"])
 def start(m):
-    uid=m.from_user.id
-    lang=get_user(uid).get("lang","en")
+    uid=str(m.from_user.id)
+    # Если новый пользователь - сразу показываем выбор языка в самом начале
+    if uid not in U:
+        bot.send_message(m.chat.id, "Choose your language / Vyberi yazyk / Izaberi jezik:\n\nEN - English\nRU - Russian\nUA - Ukrainian\nRS - Srpski\nPL - Polski\nDE - Deutsch\nFR - Francais\nES - Espanol\nIT - Italiano", reply_markup=lang_kb())
+        return
+    # Если уже есть - приветствие на его языке
+    lang=get_user(m.from_user.id).get("lang","en")
     welcome=LANGS.get(lang,LANGS["en"])["welcome"]
-    bot.send_message(m.chat.id,welcome,reply_markup=main_kb(uid))
+    bot.send_message(m.chat.id,welcome,reply_markup=main_kb(m.from_user.id))
 
 @bot.message_handler(commands=["lang","language"])
 def cmd_lang(m):
@@ -122,9 +131,9 @@ def set_lang(c):
     cur["lang"]=code
     U[uid]=cur
     save()
-    bot.answer_callback_query(c.id)
-    bot.send_message(c.message.chat.id,LANGS[code]["lang_saved"],reply_markup=main_kb(c.from_user.id))
-    bot.send_message(c.message.chat.id,LANGS[code]["welcome"],reply_markup=main_kb(c.from_user.id))
+    bot.answer_callback_query(c.id, LANGS[code]["lang_saved"])
+    bot.send_message(c.message.chat.id, LANGS[code]["lang_saved"], reply_markup=main_kb(c.from_user.id))
+    bot.send_message(c.message.chat.id, LANGS[code]["welcome"], reply_markup=main_kb(c.from_user.id))
 
 @bot.message_handler(content_types=["location"])
 def loc_h(m):
@@ -136,6 +145,12 @@ def loc_h(m):
     U[uid]=cur
     save()
     bot.send_message(m.chat.id,f"Saved! {tz} {get_dst_info(tz)}",reply_markup=main_kb(m.from_user.id))
+
+@bot.message_handler(commands=["debug"])
+def debug_cmd(m):
+    uid=str(m.from_user.id)
+    cur=U.get(uid, {})
+    bot.send_message(m.chat.id, f"DEBUG uid={uid} lang={cur.get('lang')} data={cur}")
 
 @bot.message_handler(commands=["current","today","tomorrow","week","hourly","rain","wind","sun","uv","air","alerts","time","dst","location","mylocation"])
 def profi(m):
@@ -195,7 +210,7 @@ def buttons(m):
     if "Weather" in t or "Pogoda" in t or "Wetter" in t or "Vreme" in t or "Meteo" in t or "Clima" in t or "Komandy" in t or "Nadvor" in t:
         bot.send_message(m.chat.id,"Weather:",reply_markup=weather_kb(uid))
         return
-    if "Language" in t or "Yazyk" in t or "Mova" in t or "Jezik" in t or "Jezyk" in t or "Sprache" in t:
+    if "Language" in t or "Yazyk" in t or "Mova" in t or "Jezik" in t or "Jezyk" in t or "Sprache" in t or "Langue" in t or "Idioma" in t or "Lingua" in t:
         bot.send_message(m.chat.id,tr(uid,"choose_lang"),reply_markup=lang_kb())
         return
     if "Help" in t or "Pomosh" in t or "Dopom" in t or "Dapam" in t or "Pomoc" in t or "Hilfe" in t or "Aide" in t or "Ayuda" in t or "Aiuto" in t:
@@ -233,13 +248,15 @@ def buttons(m):
 app=Flask(__name__)
 @app.route("/")
 def home():
-    return "LANG TEST OK"
+    return "LANG AT START OK"
+
 def run_web():
     app.run(host="0.0.0.0",port=10000)
+
 threading.Thread(target=run_web,daemon=True).start()
 while True:
     try:
-        bot.infinity_polling(skip_pending=True,timeout=30)
+        bot.infinity_polling(skip_pending=False,timeout=30)
     except Exception as e:
         print(e); time.sleep(10)
         try:
