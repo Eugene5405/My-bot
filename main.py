@@ -281,6 +281,32 @@ def run_web():
 
 threading.Thread(
     target=run_web,daemon=True
+app=Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Bot is running"
+
+def run_web():
+    app.run(host="0.0.0.0",port=10000)
+
+threading.Thread(
+    target=run_web,daemon=True
 ).start()
 
-bot.infinity_polling(skip_pending=True)
+# защита от 409
+while True:
+    try:
+        bot.infinity_polling(
+            skip_pending=True,
+            timeout=20,
+            long_polling_timeout=20
+        )
+    except Exception as e:
+        print(f"Polling error {e}")
+        time.sleep(10)
+        try:
+            bot.remove_webhook()
+        except:
+            pass
+        time.sleep(5)
