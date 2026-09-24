@@ -90,7 +90,7 @@ Data: Open-Meteo • Working 24/7"""
 
 WELCOME_SR="""👋 Здраво! Ја сам твој лични метеоролог
 
-Показујем време тачније од iPhone-а и никад не заборављам летње/зимско рачунање.
+Показујем време тачније од iPhone-а и никад не заборављам летње/зимско рачунање времена.
 
 📍 ШТА УМЕМ:
 
@@ -107,7 +107,18 @@ WELCOME_SR="""👋 Здраво! Ја сам твој лични метеоро�
 - /sun — излазак, залазак, дужина дана
 - /uv — УВ индекс + савет
 - /air — квалитет ваздуха AQI
-- /alerts — упозорења"""
+- /alerts — упозорења
+
+⏰ ВРЕМЕ:
+- /time — тачно време код тебе
+- /dst — летње/зимско + када је промена
+
+📍 ЛОКАЦИЈА:
+- /location — промени град
+- /mylocation — где сам сада
+
+Притисните Share Location да започнете.
+Подаци: Open-Meteo • Ради 24/7"""
 
 WELCOME_UK="""👋 Привіт! Я твій персональний метеоролог
 
@@ -120,31 +131,218 @@ WELCOME_UK="""👋 Привіт! Я твій персональний метео
 - /today — детально на сьогодні
 - /tomorrow — прогноз на завтра
 - /week — 7 днів вперед
-- /hourly — по годинах 24г"""
+- /hourly — по годинах 24г
+
+🔍 ДЕТАЛІ:
+- /rain — дощ: ймовірність + мм
+- /wind — вітер + пориви у м/с
+- /sun — схід, захід, довгота дня
+- /uv — УФ індекс + порада
+- /air — якість повітря AQI
+- /alerts — попередження
+
+⏰ ЧАС:
+- /time — точний час у тебе
+- /dst — літній/зимовий + коли переведення
+
+📍 ЛОКАЦІЯ:
+- /location — змінити місто
+- /mylocation — де я зараз
+
+Натисни Share Location щоб почати.
+Дані: Open-Meteo • Працюю 24/7"""
 
 WELCOME_BE="""👋 Прывітанне! Я твой персанальны метэаролаг
 
-Пакажу надвор'е дакладней чым iPhone і ніколі не забуду пра перавод гадзінніка."""
+Пакажу надвор'е дакладней чым iPhone і ніколі не забуду пра перавод гадзінніка.
+
+📍 ШТО ЎМЕЮ:
+
+🌤 НАДВОР'Е:
+- /current — зараз: тэмпература, адчуваецца, вільготнасць
+- /today — падрабязна на сёння
+- /tomorrow — прагноз на заўтра
+- /week — 7 дзён наперад
+- /hourly — па гадзінах 24г
+
+🔍 ДЭТАЛІ:
+- /rain — дождж: імавернасць + мм
+- /wind — вецер + павевы ў м/с
+- /sun — усход, захад, даўжыня дня
+- /uv — УФ індэкс + парада
+- /air — якасць паветра AQI
+- /alerts — папярэджанні
+
+⏰ ЧАС:
+- /time — дакладны час у цябе
+- /dst — летні/зімовы + калі перавод
+
+📍 ЛАКАЦЫЯ:
+- /location — змяніць горад
+- /mylocation — дзе я зараз
+
+Націсні Share Location каб пачаць.
+Дадзеныя: Open-Meteo • Працую 24/7"""
 
 WELCOME_PL="""👋 Cześć! Jestem Twoim osobistym meteorologiem
 
-Pokazuję pogodę dokładniej niż iPhone i nigdy nie zapomnę o zmianie czasu."""
+Pokazuję pogodę dokładniej niż iPhone i nigdy nie zapomnę o zmianie czasu.
+
+📍 CO POTRAFIĘ:
+
+🌤 POGODA:
+- /current — teraz: temperatura, odczuwalna, wilgotność
+- /today — szczegółowo dziś
+- /tomorrow — prognoza na jutro
+- /week — 7 dni naprzód
+- /hourly — co godzinę 24h
+
+🔍 SZCZEGÓŁY:
+- /rain — deszcz: prawdopodobieństwo + mm
+- /wind — wiatr + porywy w m/s
+- /sun — wschód, zachód, długość dnia
+- /uv — indeks UV + porada
+- /air — jakość powietrza AQI
+- /alerts — ostrzeżenia
+
+⏰ CZAS:
+- /time — dokładny czas u Ciebie
+- /dst — letni/zimowy + zmiana czasu
+
+📍 LOKALIZACJA:
+- /location — zmień miasto
+- /mylocation — gdzie jestem teraz
+
+Naciśnij Share Location aby zacząć.
+Dane: Open-Meteo • Pracuję 24/7"""
 
 WELCOME_DE="""👋 Hallo! Ich bin dein persönlicher Meteorologe
 
-Ich zeige Wetter genauer als iPhone und vergesse nie die Zeitumstellung."""
+Ich zeige Wetter genauer als iPhone und vergesse nie die Zeitumstellung.
+
+📍 WAS ICH KANN:
+
+🌤 WETTER:
+- /current — jetzt: Temperatur, gefühlt, Feuchtigkeit
+- /today — detailliert heute
+- /tomorrow — Prognose morgen
+- /week — 7 Tage voraus
+- /hourly — stündlich 24h
+
+🔍 DETAILS:
+- /rain — Regen: Wahrscheinlichkeit + mm
+- /wind — Wind + Böen in m/s
+- /sun — Aufgang, Untergang, Tageslänge
+- /uv — UV-Index + Tipp
+- /air — Luftqualität AQI
+- /alerts — Warnungen
+
+⏰ ZEIT:
+- /time — deine genaue Zeit
+- /dst — Sommer/Winter + Umstellung
+
+📍 STANDORT:
+- /location — Stadt ändern
+- /mylocation — wo ich bin
+
+Drücke Share Location zum Starten.
+Daten: Open-Meteo • Arbeite 24/7"""
 
 WELCOME_FR="""👋 Salut! Je suis ton météorologue personnel
 
-Plus précis qu'iPhone, je n'oublie jamais le changement d'heure."""
+Plus précis qu'iPhone, je n'oublie jamais le changement d'heure.
+
+📍 CE QUE JE FAIS:
+
+🌤 MÉTÉO:
+- /current — maintenant: température, ressenti, humidité
+- /today — détaillé aujourd'hui
+- /tomorrow — prévision demain
+- /week — 7 jours à venir
+- /hourly — horaire 24h
+
+🔍 DÉTAILS:
+- /rain — pluie: probabilité + mm
+- /wind — vent + rafales en m/s
+- /sun — lever, coucher, durée du jour
+- /uv — indice UV + conseil
+- /air — qualité de l'air AQI
+- /alerts — alertes
+
+⏰ HEURE:
+- /time — ton heure exacte
+- /dst — été/hiver + changement
+
+📍 LIEU:
+- /location — changer de ville
+- /mylocation — où je suis
+
+Appuie sur Share Location pour commencer.
+Données: Open-Meteo • Fonctionne 24/7"""
 
 WELCOME_ES="""👋 Hola! Soy tu meteorólogo personal
 
-Más preciso que iPhone, nunca olvido el cambio de hora."""
+Más preciso que iPhone, nunca olvido el cambio de hora.
+
+📍 QUÉ HAGO:
+
+🌤 CLIMA:
+- /current — ahora: temperatura, sensación, humedad
+- /today — detallado hoy
+- /tomorrow — pronóstico mañana
+- /week — 7 días adelante
+- /hourly — por horas 24h
+
+🔍 DETALLES:
+- /rain — lluvia: probabilidad + mm
+- /wind — viento + ráfagas en m/s
+- /sun — amanecer, atardecer, duración día
+- /uv — índice UV + consejo
+- /air — calidad aire AQI
+- /alerts — alertas
+
+⏰ HORA:
+- /time — tu hora exacta
+- /dst — verano/invierno + cambio
+
+📍 UBICACIÓN:
+- /location — cambiar ciudad
+- /mylocation — donde estoy
+
+Presiona Share Location para empezar.
+Datos: Open-Meteo • Trabajando 24/7"""
 
 WELCOME_IT="""👋 Ciao! Sono il tuo meteorologo personale
 
-Più preciso di iPhone, non dimentico mai l'ora legale."""
+Più preciso di iPhone, non dimentico mai l'ora legale.
+
+📍 COSA SO FARE:
+
+🌤 METEO:
+- /current — ora: temperatura, percepita, umidità
+- /today — dettagliato oggi
+- /tomorrow — previsione domani
+- /week — 7 giorni avanti
+- /hourly — orario 24h
+
+🔍 DETTAGLI:
+- /rain — pioggia: probabilità + mm
+- /wind — vento + raffiche in m/s
+- /sun — alba, tramonto, durata giorno
+- /uv — indice UV + consiglio
+- /air — qualità aria AQI
+- /alerts — allerte
+
+⏰ ORA:
+- /time — tua ora esatta
+- /dst — legale/solare + cambio
+
+📍 POSIZIONE:
+- /location — cambia città
+- /mylocation — dove sono
+
+Premi Share Location per iniziare.
+Dati: Open-Meteo • Lavoro 24/7"""
 
 LANGS={
 "ru":{"welcome":WELCOME_RU,"weather_btn":"🌤 Погода","time_btn":"🕐 Время","loc_btn":"📍 Локация","help_btn":"❓ Помощь","back":"⬅️ Назад","choose_lang":"🌐 Выбери язык:","lang_saved":"✅ Язык: Русский","current_btn":"📍 Сейчас","today_btn":"📅 Сегодня","tomorrow_btn":"➡️ Завтра","week_btn":"📆 Неделя","hourly_btn":"⏰ По часам","rain_btn":"🌧 Дождь","wind_btn":"💨 Ветер","sun_btn":"🌅 Солнце","uv_btn":"☀️ УФ","air_btn":"🌿 Воздух","alerts_btn":"⚠️ Тревоги","now_txt":"Сейчас в","feels_txt":"Ощущается","humidity_txt":"Влажность","wind_txt":"Ветер","today_txt":"Сегодня","tomorrow_txt":"Завтра","week_txt":"7 дней","rain_txt":"Дождь","rise_txt":"Рассвет","set_txt":"Закат"},
@@ -211,7 +409,6 @@ def do_cmd(chat_id, uid, cmd):
             k.add(tr(uid,"back"))
             bot.send_message(chat_id, "📍 Поделись локацией:", reply_markup=k)
             return
-
         loc=get_user(uid)
         w=get_w(loc["lat"],loc["lon"])
         if "current" not in w:
@@ -219,7 +416,6 @@ def do_cmd(chat_id, uid, cmd):
             return
         c=w["current"]; d=w["daily"]
         L=LANGS.get(get_user(uid).get("lang","ru"),LANGS["ru"])
-
         txt=""
         if cmd=="current": txt=f"📍 {L['now_txt']} {loc['timezone']}\n\n🌡 {c['temperature_2m']}°C\n{L['feels_txt']}: {c['apparent_temperature']}°C\n{L['humidity_txt']}: {c['relative_humidity_2m']}%\n{L['wind_txt']}: {c['wind_speed_10m']} м/с"
         elif cmd=="today": txt=f"📅 {L['today_txt']} {d['time'][0]} {d['temperature_2m_max'][0]}/{d['temperature_2m_min'][0]}°C {L['rain_txt']} {d['precipitation_probability_max'][0]}%"
@@ -250,7 +446,6 @@ def all_commands(m):
     cmd=m.text.split()[0].lstrip("/").split("@")[0].lower()
     if cmd=="lang": cmd="language"
     if cmd=="help": cmd="start"
-    print(f"CMD {cmd}")
     do_cmd(m.chat.id, m.from_user.id, cmd)
 
 @bot.message_handler(content_types=["location"])
@@ -301,7 +496,7 @@ def btn_h(m):
 app=Flask(__name__)
 @app.route("/")
 def home():
-    return "FINAL LANG CHOICE + ALL WELCOMES + COMMANDS"
+    return "FINAL ALL 10 BEAUTIFUL WELCOMES"
 def run_web():
     app.run(host="0.0.0.0",port=10000)
 threading.Thread(target=run_web,daemon=True).start()
