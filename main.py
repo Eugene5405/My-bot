@@ -9,18 +9,15 @@ load_dotenv()
 TOKEN=os.getenv("TOKEN")
 bot=telebot.TeleBot(TOKEN)
 bot.remove_webhook()
-time.sleep(1)
 
 FILE="locations.json"
 U={}
 if os.path.exists(FILE):
     try:
-        data=json.load(open(FILE,"r",encoding="utf-8"))
-        # ЧИНИМ БИТЫЙ ФАЙЛ - если язык не из списка, ставим ru
-        for uid, info in list(data.items()):
-            if info.get("lang") not in ["ru","en","sr","uk","be","pl","de","fr","es","it"]:
-                info["lang"]="ru"
-        U=data
+        U=json.load(open(FILE,"r",encoding="utf-8"))
+        for uid in list(U.keys()):
+            if U[uid].get("lang") not in ["ru","en","sr","uk","be","pl","de","fr","es","it"]:
+                U[uid]["lang"]="ru"
     except:
         U={}
 
@@ -32,24 +29,32 @@ WELCOME="""👋 Привет! Я твой персональный метеор�
 Я покажу погоду точнее чем iPhone, и никогда не забуду про перевод часов.
 
 📍 ЧТО Я УМЕЮ:
+
 🌤 ПОГОДА:
-/current — сейчас
-/today — сегодня
-/tomorrow — завтра
-/week — 7 дней
-/hourly — по часам
+/current — сейчас: температура, ощущается, влажность
+/today — подробно на сегодня
+/tomorrow — прогноз на завтра
+/week — 7 дней вперед
+/hourly — по часам на 24ч
 
 🔍 ДЕТАЛИ:
-/rain /wind /sun /uv /air /alerts
+/rain — дождь: вероятность + мм
+/wind — ветер + порывы
+/sun — рассвет, закат, долгота дня
+/uv — UV индекс + совет
+/air — качество воздуха AQI + PM2.5
+/alerts — предупреждения
 
 ⏰ ВРЕМЯ:
-/time /dst
+/time — точное время у тебя
+/dst — летнее/зимнее + когда перевод
 
 📍 ЛОКАЦИЯ:
-/location /mylocation
+/location — сменить город
+/mylocation — где я сейчас
 
 Нажми Share Location чтобы начать.
-Данные: Open-Meteo • 24/7"""
+Данные: Open-Meteo • Работаю 24/7"""
 
 LANGS={
 "ru":{"welcome":WELCOME,"weather_btn":"🌤 Погода","time_btn":"🕐 Время","loc_btn":"📍 Локация","help_btn":"❓ Помощь","back":"⬅️ Назад","choose_lang":"🌐 Выбери язык:","lang_saved":"✅ Русский","current_btn":"📍 Сейчас","today_btn":"📅 Сегодня","tomorrow_btn":"➡️ Завтра","week_btn":"📆 Неделя","hourly_btn":"⏰ По часам","rain_btn":"🌧 Дождь","wind_btn":"💨 Ветер","sun_btn":"🌅 Солнце","uv_btn":"☀️ УФ","air_btn":"🌿 Воздух","alerts_btn":"⚠️ Тревоги","now_txt":"Сейчас в","feels_txt":"Ощущается","humidity_txt":"Влажность","wind_txt":"Ветер","today_txt":"Сегодня","tomorrow_txt":"Завтра","week_txt":"7 дней","rain_txt":"Дождь","rise_txt":"Рассвет","set_txt":"Закат"},
@@ -66,19 +71,18 @@ LANGS={
 
 def get_user(uid):
     info=U.get(str(uid), {"lat":44.81,"lon":20.46,"timezone":"Europe/Belgrade","lang":"ru"})
-    if info.get("lang") not in LANGS:
-        info["lang"]="ru"
+    if info.get("lang") not in LANGS: info["lang"]="ru"
     return info
 
 def tr(uid,key):
-    info=get_user(uid)
-    lang=info.get("lang","ru")
+    lang=get_user(uid).get("lang","ru")
     if lang not in LANGS: lang="ru"
     return LANGS[lang].get(key,key)
 
 def get_w(lat,lon):
     url=f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset,uv_index_max,wind_speed_10m_max,wind_gusts_10m_max&hourly=temperature_2m,precipitation_probability&timezone=auto&forecast_days=7&wind_speed_unit=ms"
-    return requests.get(url,timeout=10).json()
+    r=requests.get(url,timeout=15).json()
+    return r
 
 def main_kb(uid):
     k=types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -103,12 +107,13 @@ def lang_kb():
 
 def do_cmd(chat_id, uid, cmd):
     try:
-        loc=get_user(uid)
-        w=get_w(loc["lat"],loc["lon"])
-        c=w["current"]; d=w["daily"]
-        L=LANGS.get(get_user(uid).get("lang","ru"),LANGS["ru"])
+        # Команды без погоды - сразу отвечаем
         if cmd=="start":
+            L=LANGS.get(get_user(uid).get("lang","ru"),LANGS["ru"])
             bot.send_message(chat_id, L["welcome"], reply_markup=main_kb(uid))
+            return
+        if cmd=="language":
+            bot.send_message(chat_id, tr(uid,"choose_lang"), reply_markup=lang_kb())
             return
         if cmd=="location":
             k=types.ReplyKeyboardMarkup(resize_keyboard=True,one_time_keyboard=True)
@@ -116,9 +121,16 @@ def do_cmd(chat_id, uid, cmd):
             k.add(tr(uid,"back"))
             bot.send_message(chat_id, "📍 Поделись локацией:", reply_markup=k)
             return
-        if cmd=="language":
-            bot.send_message(chat_id, tr(uid,"choose_lang"), reply_markup=lang_kb())
+
+        # Только тут получаем погоду
+        loc=get_user(uid)
+        w=get_w(loc["lat"],loc["lon"])
+        if "current" not in w:
+            bot.send_message(chat_id, f"API ошибка, пробую снова... {str(w)[:200]}")
             return
+        c=w["current"]; d=w["daily"]
+        L=LANGS.get(get_user(uid).get("lang","ru"),LANGS["ru"])
+
         txt=""
         if cmd=="current": txt=f"📍 {L['now_txt']} {loc['timezone']}\n\n🌡 {c['temperature_2m']}°C\n{L['feels_txt']}: {c['apparent_temperature']}°C\n{L['humidity_txt']}: {c['relative_humidity_2m']}%\n{L['wind_txt']}: {c['wind_speed_10m']} м/с"
         elif cmd=="today": txt=f"📅 {L['today_txt']} {d['time'][0]} {d['temperature_2m_max'][0]}/{d['temperature_2m_min'][0]}°C {L['rain_txt']} {d['precipitation_probability_max'][0]}%"
@@ -141,7 +153,8 @@ def do_cmd(chat_id, uid, cmd):
         elif cmd=="mylocation": txt=f"{loc['lat']},{loc['lon']} {loc['timezone']}"
         bot.send_message(chat_id, txt, reply_markup=weather_kb(uid))
     except Exception as e:
-        print(f"ERROR in do_cmd {cmd}: {e}")
+        print(f"ERR {cmd}: {e}")
+        import traceback; traceback.print_exc()
         bot.send_message(chat_id, f"Ошибка {cmd}: {e}")
 
 @bot.message_handler(commands=["start","current","today","tomorrow","week","hourly","rain","wind","sun","uv","air","alerts","time","dst","location","mylocation","language","lang","help"])
@@ -200,7 +213,7 @@ def btn_h(m):
 app=Flask(__name__)
 @app.route("/")
 def home():
-    return "FIXED current bug"
+    return "FIXED FINAL"
 def run_web():
     app.run(host="0.0.0.0",port=10000)
 threading.Thread(target=run_web,daemon=True).start()
