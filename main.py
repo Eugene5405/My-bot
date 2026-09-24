@@ -11,34 +11,19 @@ bot=telebot.TeleBot(TOKEN)
 bot.remove_webhook()
 time.sleep(1)
 
-# ОБЯЗАТЕЛЬНО - ставим меню команд чтобы Телеграм их видел
-try:
-    bot.set_my_commands([
-        types.BotCommand("start", "Старт"),
-        types.BotCommand("current", "Сейчас"),
-        types.BotCommand("today", "Сегодня"),
-        types.BotCommand("tomorrow", "Завтра"),
-        types.BotCommand("week", "Неделя"),
-        types.BotCommand("hourly", "По часам"),
-        types.BotCommand("rain", "Дождь"),
-        types.BotCommand("wind", "Ветер"),
-        types.BotCommand("sun", "Солнце"),
-        types.BotCommand("uv", "УФ"),
-        types.BotCommand("time", "Время"),
-        types.BotCommand("dst", "Время"),
-        types.BotCommand("location", "Локация"),
-        types.BotCommand("language", "Язык"),
-    ])
-except:
-    pass
-
 FILE="locations.json"
 U={}
 if os.path.exists(FILE):
     try:
-        U=json.load(open(FILE,"r",encoding="utf-8"))
+        data=json.load(open(FILE,"r",encoding="utf-8"))
+        # ЧИНИМ БИТЫЙ ФАЙЛ - если язык не из списка, ставим ru
+        for uid, info in list(data.items()):
+            if info.get("lang") not in ["ru","en","sr","uk","be","pl","de","fr","es","it"]:
+                info["lang"]="ru"
+        U=data
     except:
         U={}
+
 def save():
     json.dump(U,open(FILE,"w",encoding="utf-8"),ensure_ascii=False)
 
@@ -47,37 +32,29 @@ WELCOME="""👋 Привет! Я твой персональный метеор�
 Я покажу погоду точнее чем iPhone, и никогда не забуду про перевод часов.
 
 📍 ЧТО Я УМЕЮ:
-
 🌤 ПОГОДА:
-- /current — сейчас: температура, ощущается, влажность
-- /today — подробно на сегодня
-- /tomorrow — прогноз на завтра
-- /week — 7 дней вперед
-- /hourly — по часам на 24ч
+/current — сейчас
+/today — сегодня
+/tomorrow — завтра
+/week — 7 дней
+/hourly — по часам
 
 🔍 ДЕТАЛИ:
-- /rain — дождь: вероятность + мм
-- /wind — ветер + порывы
-- /sun — рассвет, закат, долгота дня
-- /uv — UV индекс + совет
-- /air — качество воздуха AQI + PM2.5
-- /alerts — предупреждения
+/rain /wind /sun /uv /air /alerts
 
 ⏰ ВРЕМЯ:
-- /time — точное время у тебя
-- /dst — летнее/зимнее + когда перевод
+/time /dst
 
 📍 ЛОКАЦИЯ:
-- /location — сменить город
-- /mylocation — где я сейчас
+/location /mylocation
 
 Нажми Share Location чтобы начать.
-Данные: Open-Meteo • Работаю 24/7"""
+Данные: Open-Meteo • 24/7"""
 
 LANGS={
 "ru":{"welcome":WELCOME,"weather_btn":"🌤 Погода","time_btn":"🕐 Время","loc_btn":"📍 Локация","help_btn":"❓ Помощь","back":"⬅️ Назад","choose_lang":"🌐 Выбери язык:","lang_saved":"✅ Русский","current_btn":"📍 Сейчас","today_btn":"📅 Сегодня","tomorrow_btn":"➡️ Завтра","week_btn":"📆 Неделя","hourly_btn":"⏰ По часам","rain_btn":"🌧 Дождь","wind_btn":"💨 Ветер","sun_btn":"🌅 Солнце","uv_btn":"☀️ УФ","air_btn":"🌿 Воздух","alerts_btn":"⚠️ Тревоги","now_txt":"Сейчас в","feels_txt":"Ощущается","humidity_txt":"Влажность","wind_txt":"Ветер","today_txt":"Сегодня","tomorrow_txt":"Завтра","week_txt":"7 дней","rain_txt":"Дождь","rise_txt":"Рассвет","set_txt":"Закат"},
-"en":{"welcome":WELCOME.replace("Привет","Hi"),"weather_btn":"🌤 Whether commands","time_btn":"🕐 Time","loc_btn":"📍 Location","help_btn":"❓ Help","back":"⬅️ Back","choose_lang":"🌐 Choose language:","lang_saved":"✅ English","current_btn":"📍 Current","today_btn":"📅 Today","tomorrow_btn":"➡️ Tomorrow","week_btn":"📆 Week","hourly_btn":"⏰ Hourly","rain_btn":"🌧 Rain","wind_btn":"💨 Wind","sun_btn":"🌅 Sun","uv_btn":"☀️ UV","air_btn":"🌿 Air","alerts_btn":"⚠️ Alerts","now_txt":"Now in","feels_txt":"Feels","humidity_txt":"Humidity","wind_txt":"Wind","today_txt":"Today","tomorrow_txt":"Tomorrow","week_txt":"7 days","rain_txt":"Rain","rise_txt":"Sunrise","set_txt":"Sunset"},
-"sr":{"welcome":"👋 Здраво! Ја сам твој метеоролог","weather_btn":"🌤 Време","time_btn":"🕐 Време","loc_btn":"📍 Локација","help_btn":"❓ Помоћ","back":"⬅️ Назад","choose_lang":"🌐 Језик:","lang_saved":"✅ Српски","current_btn":"📍 Тренутно","today_btn":"📅 Данас","tomorrow_btn":"➡️ Сутра","week_btn":"📆 Недеља","hourly_btn":"⏰ По сатима","rain_btn":"🌧 Киша","wind_btn":"💨 Ветар","sun_btn":"🌅 Сунце","uv_btn":"☀️ УВ","air_btn":"🌿 Ваздух","alerts_btn":"⚠️ Упозорења","now_txt":"Сада у","feels_txt":"Осећај","humidity_txt":"Влага","wind_txt":"Ветар","today_txt":"Данас","tomorrow_txt":"Сутра","week_txt":"7 дана","rain_txt":"Киша","rise_txt":"Излазак","set_txt":"Залазак"},
+"en":{"welcome":WELCOME,"weather_btn":"🌤 Whether commands","time_btn":"🕐 Time","loc_btn":"📍 Location","help_btn":"❓ Help","back":"⬅️ Back","choose_lang":"🌐 Choose language:","lang_saved":"✅ English","current_btn":"📍 Current","today_btn":"📅 Today","tomorrow_btn":"➡️ Tomorrow","week_btn":"📆 Week","hourly_btn":"⏰ Hourly","rain_btn":"🌧 Rain","wind_btn":"💨 Wind","sun_btn":"🌅 Sun","uv_btn":"☀️ UV","air_btn":"🌿 Air","alerts_btn":"⚠️ Alerts","now_txt":"Now in","feels_txt":"Feels","humidity_txt":"Humidity","wind_txt":"Wind","today_txt":"Today","tomorrow_txt":"Tomorrow","week_txt":"7 days","rain_txt":"Rain","rise_txt":"Sunrise","set_txt":"Sunset"},
+"sr":{"welcome":"👋 Здраво!","weather_btn":"🌤 Време","time_btn":"🕐 Време","loc_btn":"📍 Локација","help_btn":"❓ Помоћ","back":"⬅️ Назад","choose_lang":"🌐 Језик:","lang_saved":"✅ Српски","current_btn":"📍 Тренутно","today_btn":"📅 Данас","tomorrow_btn":"➡️ Сутра","week_btn":"📆 Недеља","hourly_btn":"⏰ По сатима","rain_btn":"🌧 Киша","wind_btn":"💨 Ветар","sun_btn":"🌅 Сунце","uv_btn":"☀️ УВ","air_btn":"🌿 Ваздух","alerts_btn":"⚠️ Упозорења","now_txt":"Сада у","feels_txt":"Осећај","humidity_txt":"Влага","wind_txt":"Ветар","today_txt":"Данас","tomorrow_txt":"Сутра","week_txt":"7 дана","rain_txt":"Киша","rise_txt":"Излазак","set_txt":"Залазак"},
 "uk":{"welcome":"👋 Привіт!","weather_btn":"🌤 Погода","time_btn":"🕐 Час","loc_btn":"📍 Локація","help_btn":"❓ Допомога","back":"⬅️ Назад","choose_lang":"🌐 Мова:","lang_saved":"✅ Українська","current_btn":"📍 Зараз","today_btn":"📅 Сьогодні","tomorrow_btn":"➡️ Завтра","week_btn":"📆 Тиждень","hourly_btn":"⏰ Погодинно","rain_btn":"🌧 Дощ","wind_btn":"💨 Вітер","sun_btn":"🌅 Сонце","uv_btn":"☀️ УФ","air_btn":"🌿 Повітря","alerts_btn":"⚠️ Тривоги","now_txt":"Зараз у","feels_txt":"Відчувається","humidity_txt":"Вологість","wind_txt":"Вітер","today_txt":"Сьогодні","tomorrow_txt":"Завтра","week_txt":"7 днів","rain_txt":"Дощ","rise_txt":"Схід","set_txt":"Захід"},
 "be":{"welcome":"👋 Прывітанне!","weather_btn":"🌤 Надвор'е","time_btn":"🕐 Час","loc_btn":"📍 Лакацыя","help_btn":"❓ Дапамога","back":"⬅️ Назад","choose_lang":"🌐 Мова:","lang_saved":"✅ Беларуская","current_btn":"📍 Зараз","today_btn":"📅 Сёння","tomorrow_btn":"➡️ Заўтра","week_btn":"📆 Тыдзень","hourly_btn":"⏰ Па гадзінах","rain_btn":"🌧 Дождж","wind_btn":"💨 Вецер","sun_btn":"🌅 Сонца","uv_btn":"☀️ УФ","air_btn":"🌿 Паветра","alerts_btn":"⚠️ Трывогі","now_txt":"Зараз у","feels_txt":"Адчуваецца","humidity_txt":"Вільготнасць","wind_txt":"Вецер","today_txt":"Сёння","tomorrow_txt":"Заўтра","week_txt":"7 дзён","rain_txt":"Дождж","rise_txt":"Усход","set_txt":"Захад"},
 "pl":{"welcome":"👋 Cześć!","weather_btn":"🌤 Pogoda","time_btn":"🕐 Czas","loc_btn":"📍 Lokalizacja","help_btn":"❓ Pomoc","back":"⬅️ Wróć","choose_lang":"🌐 Język:","lang_saved":"✅ Polski","current_btn":"📍 Teraz","today_btn":"📅 Dziś","tomorrow_btn":"➡️ Jutro","week_btn":"📆 Tydzień","hourly_btn":"⏰ Co godzinę","rain_btn":"🌧 Deszcz","wind_btn":"💨 Wiatr","sun_btn":"🌅 Słońce","uv_btn":"☀️ UV","air_btn":"🌿 Powietrze","alerts_btn":"⚠️ Alerty","now_txt":"Teraz w","feels_txt":"Odczuwalna","humidity_txt":"Wilgotność","wind_txt":"Wiatr","today_txt":"Dziś","tomorrow_txt":"Jutro","week_txt":"7 dni","rain_txt":"Deszcz","rise_txt":"Wschód","set_txt":"Zachód"},
@@ -88,10 +65,17 @@ LANGS={
 }
 
 def get_user(uid):
-    return U.get(str(uid), {"lat":44.81,"lon":20.46,"timezone":"Europe/Belgrade","lang":"ru"})
+    info=U.get(str(uid), {"lat":44.81,"lon":20.46,"timezone":"Europe/Belgrade","lang":"ru"})
+    if info.get("lang") not in LANGS:
+        info["lang"]="ru"
+    return info
+
 def tr(uid,key):
-    lang=U.get(str(uid),{}).get("lang","ru")
-    return LANGS.get(lang,LANGS["ru"]).get(key,key)
+    info=get_user(uid)
+    lang=info.get("lang","ru")
+    if lang not in LANGS: lang="ru"
+    return LANGS[lang].get(key,key)
+
 def get_w(lat,lon):
     url=f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset,uv_index_max,wind_speed_10m_max,wind_gusts_10m_max&hourly=temperature_2m,precipitation_probability&timezone=auto&forecast_days=7&wind_speed_unit=ms"
     return requests.get(url,timeout=10).json()
@@ -118,52 +102,54 @@ def lang_kb():
     return k
 
 def do_cmd(chat_id, uid, cmd):
-    loc=get_user(uid)
-    w=get_w(loc["lat"],loc["lon"])
-    c=w["current"]; d=w["daily"]
-    L=LANGS.get(U.get(str(uid),{}).get("lang","ru"),LANGS["ru"])
-    if cmd=="start":
-        bot.send_message(chat_id, L["welcome"], reply_markup=main_kb(uid))
-        return
-    if cmd=="location":
-        k=types.ReplyKeyboardMarkup(resize_keyboard=True,one_time_keyboard=True)
-        k.add(types.KeyboardButton("📍 Поделиться локацией",request_location=True))
-        k.add(tr(uid,"back"))
-        bot.send_message(chat_id, "📍 Поделись локацией:", reply_markup=k)
-        return
-    if cmd=="language":
-        bot.send_message(chat_id, tr(uid,"choose_lang"), reply_markup=lang_kb())
-        return
-    txt=""
-    if cmd=="current": txt=f"📍 {L['now_txt']} {loc['timezone']}\n\n🌡 {c['temperature_2m']}°C\n{L['feels_txt']}: {c['apparent_temperature']}°C\n{L['humidity_txt']}: {c['relative_humidity_2m']}%\n{L['wind_txt']}: {c['wind_speed_10m']} м/с"
-    elif cmd=="today": txt=f"📅 {L['today_txt']} {d['time'][0]} {d['temperature_2m_max'][0]}/{d['temperature_2m_min'][0]}°C {L['rain_txt']} {d['precipitation_probability_max'][0]}%"
-    elif cmd=="tomorrow": txt=f"➡️ {L['tomorrow_txt']} {d['time'][1]} {d['temperature_2m_max'][1]}/{d['temperature_2m_min'][1]}°C"
-    elif cmd=="week":
-        txt=f"📆 {L['week_txt']}\n"
-        for i in range(7): txt+=f"{d['time'][i]} {d['temperature_2m_min'][i]}/{d['temperature_2m_max'][i]}°C {d['precipitation_probability_max'][i]}%\n"
-    elif cmd=="hourly":
-        h=w["hourly"]; txt="⏰\n"
-        for i in range(12): txt+=f"{h['time'][i][11:]} {h['temperature_2m'][i]}°C {h['precipitation_probability'][i]}%\n"
-    elif cmd=="rain": txt=f"🌧 {L['rain_txt']} {d['precipitation_probability_max'][0]}% {d['precipitation_sum'][0]}мм"
-    elif cmd=="wind": txt=f"💨 {L['wind_txt']}: {c['wind_speed_10m']} м/с\nПорывы: {d['wind_gusts_10m_max'][0]} м/с\nМакс: {d['wind_speed_10m_max'][0]} м/с"
-    elif cmd=="sun": txt=f"🌅 {L['rise_txt']}: {d['sunrise'][0][11:]}\n🌇 {L['set_txt']}: {d['sunset'][0][11:]}"
-    elif cmd=="uv": txt=f"☀️ UV {d['uv_index_max'][0]}"
-    elif cmd=="air": txt="🌿 Воздух — скоро"
-    elif cmd=="alerts": txt="⚠️ Нет тревог"
-    elif cmd in ["time","dst"]:
-        now=datetime.now(ZoneInfo(loc["timezone"]))
-        txt=f"🕐 {now.strftime('%H:%M:%S %d.%m.%Y')} {loc['timezone']}"
-    elif cmd=="mylocation": txt=f"{loc['lat']},{loc['lon']} {loc['timezone']}"
-    else: txt=f"Не знаю {cmd}"
-    bot.send_message(chat_id, txt, reply_markup=weather_kb(uid) if cmd not in ["time","dst","mylocation"] else main_kb(uid))
+    try:
+        loc=get_user(uid)
+        w=get_w(loc["lat"],loc["lon"])
+        c=w["current"]; d=w["daily"]
+        L=LANGS.get(get_user(uid).get("lang","ru"),LANGS["ru"])
+        if cmd=="start":
+            bot.send_message(chat_id, L["welcome"], reply_markup=main_kb(uid))
+            return
+        if cmd=="location":
+            k=types.ReplyKeyboardMarkup(resize_keyboard=True,one_time_keyboard=True)
+            k.add(types.KeyboardButton("📍 Поделиться локацией",request_location=True))
+            k.add(tr(uid,"back"))
+            bot.send_message(chat_id, "📍 Поделись локацией:", reply_markup=k)
+            return
+        if cmd=="language":
+            bot.send_message(chat_id, tr(uid,"choose_lang"), reply_markup=lang_kb())
+            return
+        txt=""
+        if cmd=="current": txt=f"📍 {L['now_txt']} {loc['timezone']}\n\n🌡 {c['temperature_2m']}°C\n{L['feels_txt']}: {c['apparent_temperature']}°C\n{L['humidity_txt']}: {c['relative_humidity_2m']}%\n{L['wind_txt']}: {c['wind_speed_10m']} м/с"
+        elif cmd=="today": txt=f"📅 {L['today_txt']} {d['time'][0]} {d['temperature_2m_max'][0]}/{d['temperature_2m_min'][0]}°C {L['rain_txt']} {d['precipitation_probability_max'][0]}%"
+        elif cmd=="tomorrow": txt=f"➡️ {L['tomorrow_txt']} {d['time'][1]} {d['temperature_2m_max'][1]}/{d['temperature_2m_min'][1]}°C"
+        elif cmd=="week":
+            txt=f"📆 {L['week_txt']}\n"
+            for i in range(7): txt+=f"{d['time'][i]} {d['temperature_2m_min'][i]}/{d['temperature_2m_max'][i]}°C {d['precipitation_probability_max'][i]}%\n"
+        elif cmd=="hourly":
+            h=w["hourly"]; txt="⏰\n"
+            for i in range(12): txt+=f"{h['time'][i][11:]} {h['temperature_2m'][i]}°C {h['precipitation_probability'][i]}%\n"
+        elif cmd=="rain": txt=f"🌧 {L['rain_txt']} {d['precipitation_probability_max'][0]}% {d['precipitation_sum'][0]}мм"
+        elif cmd=="wind": txt=f"💨 {L['wind_txt']}: {c['wind_speed_10m']} м/с\nПорывы: {d['wind_gusts_10m_max'][0]} м/с\nМакс: {d['wind_speed_10m_max'][0]} м/с"
+        elif cmd=="sun": txt=f"🌅 {L['rise_txt']}: {d['sunrise'][0][11:]}\n🌇 {L['set_txt']}: {d['sunset'][0][11:]}"
+        elif cmd=="uv": txt=f"☀️ UV {d['uv_index_max'][0]}"
+        elif cmd=="air": txt="🌿 Воздух — скоро"
+        elif cmd=="alerts": txt="⚠️ Нет тревог"
+        elif cmd in ["time","dst"]:
+            now=datetime.now(ZoneInfo(loc["timezone"]))
+            txt=f"🕐 {now.strftime('%H:%M:%S %d.%m.%Y')} {loc['timezone']}"
+        elif cmd=="mylocation": txt=f"{loc['lat']},{loc['lon']} {loc['timezone']}"
+        bot.send_message(chat_id, txt, reply_markup=weather_kb(uid))
+    except Exception as e:
+        print(f"ERROR in do_cmd {cmd}: {e}")
+        bot.send_message(chat_id, f"Ошибка {cmd}: {e}")
 
-# ОДИН ЕДИНСТВЕННЫЙ ХЕНДЛЕР НА КОМАНДЫ
 @bot.message_handler(commands=["start","current","today","tomorrow","week","hourly","rain","wind","sun","uv","air","alerts","time","dst","location","mylocation","language","lang","help"])
 def all_commands(m):
     cmd=m.text.split()[0].lstrip("/").split("@")[0].lower()
     if cmd=="lang": cmd="language"
     if cmd=="help": cmd="start"
-    print(f"CMD: {cmd} from {m.from_user.id}")
+    print(f"CMD {cmd}")
     do_cmd(m.chat.id, m.from_user.id, cmd)
 
 @bot.message_handler(content_types=["location"])
@@ -214,11 +200,10 @@ def btn_h(m):
 app=Flask(__name__)
 @app.route("/")
 def home():
-    return "WORKING COMMANDS FIX"
+    return "FIXED current bug"
 def run_web():
     app.run(host="0.0.0.0",port=10000)
 threading.Thread(target=run_web,daemon=True).start()
-print("BOT STARTED")
 while True:
     try:
         bot.infinity_polling(skip_pending=True, timeout=20, long_polling_timeout=10)
