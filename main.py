@@ -1,6 +1,5 @@
 from flask import Flask
-import threading, telebot
-import requests, json, os, time
+import threading, telebot, requests, json, os, time
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from telebot import types
@@ -25,15 +24,11 @@ def save():
     open(FILE,"w").write(json.dumps(U))
 
 def get_loc(uid):
-    return U.get(str(uid),{
-        "lat":44.81,
-        "lon":20.46,
-        "timezone":"Europe/Belgrade"
-    })
+    return U.get(str(uid),{"lat":44.81,"lon":20.46,"timezone":"Europe/Belgrade"})
 
 def get_w(lat,lon):
-    u=f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset,uv_index_max,wind_speed_10m_max&hourly=temperature_2m,precipitation_probability&timezone=auto&forecast_days=7"
-    return requests.get(u,timeout=10).json()
+    url=f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset,uv_index_max,wind_speed_10m_max&hourly=temperature_2m,precipitation_probability&timezone=auto&forecast_days=7"
+    return requests.get(url,timeout=10).json()
 
 def get_air(lat,lon):
     try:
@@ -43,9 +38,9 @@ def get_air(lat,lon):
     except:
         return None
 
-def get_dst(tz):
+def get_dst(tz_name):
     try:
-        z=ZoneInfo(tz)
+        z=ZoneInfo(tz_name)
         n=datetime.now(z)
         isdst=lambda d:d.dst()!=timedelta(0)
         cur=isdst(n)
@@ -56,9 +51,9 @@ def get_dst(tz):
             c=c.replace(hour=2,minute=0,second=0)
             if isdst(c)!=cur:
                 ds=c.strftime("%d %B %Y")
-                d="ВПЕРЕД" if isdst(c) else "НАЗАД"
-                return f"{tz}\n{s}\n{ds}\n{d}"
-        return f"{tz}\n{s}\nНет перехода"
+                dr="ВПЕРЕД" if isdst(c) else "НАЗАД"
+                return f"{tz_name}\n{s}\n{ds}\n{dr}"
+        return f"{tz_name}\n{s}\nНет перехода"
     except Exception as e:
         return str(e)
 
@@ -103,7 +98,8 @@ def loc_h(m):
     U[str(m.from_user.id)]={"lat":m.location.latitude,"lon":m.location.longitude,"timezone":tz}
     save()
     bot.send_message(m.chat.id,f"Saved {tz}\n{get_dst(tz)}",reply_markup=main_kb())
-  @bot.message_handler(func=lambda m:True)
+
+@bot.message_handler(func=lambda m: True)
 def all_t(m):
     t=(m.text or "").strip()
     if t=="Back to main menu":
@@ -154,7 +150,7 @@ def all_t(m):
         d=w["daily"]
         txt=f"{d['sunrise'][0][11:]} - {d['sunset'][0][11:]}"
     if t=="Wind":
-        txt=f"{w['current']['wind_speed_10m']} km/h max {w['daily']['wind_speed_10m_max'][0]}"
+        txt=f"{w['current']['wind_speed_10m']} km/h"
     if t=="Weather alerts":
         txt="No alerts"
     bot.send_message(m.chat.id,txt,reply_markup=weather_kb())
@@ -180,4 +176,3 @@ while True:
             bot.remove_webhook()
         except:
             pass
-        time.sleep(5)
