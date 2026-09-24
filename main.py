@@ -14,11 +14,10 @@ FILE="locations.json"
 U={}
 if os.path.exists(FILE):
     try:
-        data=json.load(open(FILE,"r",encoding="utf-8"))
-        for uid in list(data.keys()):
-            if data[uid].get("lang") not in ["ru","en","sr","uk","be","pl","de","fr","es","it"]:
-                data[uid]["lang"]="ru"
-        U=data
+        U=json.load(open(FILE,"r",encoding="utf-8"))
+        for uid in list(U.keys()):
+            if U[uid].get("lang") not in ["ru","en","sr","uk","be","pl","de","fr","es","it"]:
+                U[uid]["lang"]="ru"
     except:
         U={}
 def save():
@@ -31,324 +30,112 @@ WELCOME_RU="""👋 Привет! Я твой персональный метео
 📍 ЧТО Я УМЕЮ:
 
 🌤 ПОГОДА:
-- /current — сейчас: температура, ощущается, влажность
-- /today — подробно на сегодня
-- /tomorrow — прогноз на завтра
-- /week — 7 дней вперед
-- /hourly — по часам на 24ч
+/current — сейчас: температура, ощущается, влажность
+/today — подробно на сегодня
+/tomorrow — прогноз на завтра
+/week — 7 дней вперед
+/hourly — по часам на 24ч
 
 🔍 ДЕТАЛИ:
-- /rain — дождь: вероятность + мм
-- /wind — ветер + порывы в м/с
-- /sun — рассвет, закат, долгота дня
-- /uv — UV индекс + совет
-- /air — качество воздуха AQI
-- /alerts — предупреждения
+/rain — дождь: вероятность + мм
+/wind — ветер + порывы в м/с
+/sun — рассвет, закат, долгота дня
+/uv — UV индекс + совет
+/air — качество воздуха AQI
+/alerts — предупреждения
 
 ⏰ ВРЕМЯ:
-- /time — точное время у тебя
-- /dst — летнее/зимнее + когда перевод
+/time — точное время у тебя
+/dst — летнее/зимнее + когда перевод
 
 📍 ЛОКАЦИЯ:
-- /location — сменить город
-- /mylocation — где я сейчас
+/location — сменить город
+/mylocation — где я сейчас
 
 Нажми Share Location чтобы начать.
 Данные: Open-Meteo • Работаю 24/7"""
 
 WELCOME_EN="""👋 Hi! I'm your personal meteorologist
-
 I show weather more accurate than iPhone, and I never forget DST.
 
 📍 WHAT I CAN DO:
+🌤 /current — now, /today, /tomorrow, /week, /hourly
+🔍 /rain, /wind m/s, /sun, /uv, /air, /alerts
+⏰ /time, /dst
+📍 /location, /mylocation
 
-🌤 WEATHER:
-- /current — now: temp, feels like, humidity
-- /today — detailed today
-- /tomorrow — tomorrow forecast
-- /week — 7 days ahead
-- /hourly — hourly 24h
-
-🔍 DETAILS:
-- /rain — rain: chance + mm
-- /wind — wind + gusts in m/s
-- /sun — sunrise, sunset, day length
-- /uv — UV index + advice
-- /air — air quality AQI
-- /alerts — warnings
-
-⏰ TIME:
-- /time — your exact time
-- /dst — summer/winter + DST change
-
-📍 LOCATION:
-- /location — change city
-- /mylocation — where I am
-
-Press Share Location to start.
-Data: Open-Meteo • Working 24/7"""
+Press Share Location to start."""
 
 WELCOME_SR="""👋 Здраво! Ја сам твој лични метеоролог
-
-Показујем време тачније од iPhone-а и никад не заборављам летње/зимско рачунање времена.
+Показујем време тачније од iPhone-а и никад не заборављам летње/зимско.
 
 📍 ШТА УМЕМ:
-
-🌤 ВРЕМЕ:
-- /current — сада: температура, осећај, влажност
-- /today — детаљно за данас
-- /tomorrow — прогноза за сутра
-- /week — 7 дана унапред
-- /hourly — по сатима 24ч
-
-🔍 ДЕТАЉИ:
-- /rain — киша: вероватноћа + мм
-- /wind — ветар + удари у м/с
-- /sun — излазак, залазак, дужина дана
-- /uv — УВ индекс + савет
-- /air — квалитет ваздуха AQI
-- /alerts — упозорења
-
-⏰ ВРЕМЕ:
-- /time — тачно време код тебе
-- /dst — летње/зимско + када је промена
-
-📍 ЛОКАЦИЈА:
-- /location — промени град
-- /mylocation — где сам сада
-
-Притисните Share Location да започнете.
-Подаци: Open-Meteo • Ради 24/7"""
+🌤 /current — сада, /today, /tomorrow, /week, /hourly
+🔍 /rain, /wind m/s, /sun, /uv, /air, /alerts
+⏰ /time, /dst
+📍 /location, /mylocation"""
 
 WELCOME_UK="""👋 Привіт! Я твій персональний метеоролог
-
-Покажу погоду точніше за iPhone і ніколи не забуду про переведення годинника.
+Покажу погоду точніше за iPhone і ніколи не забуду про переведення.
 
 📍 ЩО ВМІЮ:
-
-🌤 ПОГОДА:
-- /current — зараз: температура, відчувається, вологість
-- /today — детально на сьогодні
-- /tomorrow — прогноз на завтра
-- /week — 7 днів вперед
-- /hourly — по годинах 24г
-
-🔍 ДЕТАЛІ:
-- /rain — дощ: ймовірність + мм
-- /wind — вітер + пориви у м/с
-- /sun — схід, захід, довгота дня
-- /uv — УФ індекс + порада
-- /air — якість повітря AQI
-- /alerts — попередження
-
-⏰ ЧАС:
-- /time — точний час у тебе
-- /dst — літній/зимовий + коли переведення
-
-📍 ЛОКАЦІЯ:
-- /location — змінити місто
-- /mylocation — де я зараз
-
-Натисни Share Location щоб почати.
-Дані: Open-Meteo • Працюю 24/7"""
+🌤 /current — зараз, /today, /tomorrow, /week, /hourly
+🔍 /rain, /wind м/с, /sun, /uv, /air, /alerts
+⏰ /time, /dst"""
 
 WELCOME_BE="""👋 Прывітанне! Я твой персанальны метэаролаг
-
-Пакажу надвор'е дакладней чым iPhone і ніколі не забуду пра перавод гадзінніка.
+Пакажу надвор'е дакладней чым iPhone.
 
 📍 ШТО ЎМЕЮ:
-
-🌤 НАДВОР'Е:
-- /current — зараз: тэмпература, адчуваецца, вільготнасць
-- /today — падрабязна на сёння
-- /tomorrow — прагноз на заўтра
-- /week — 7 дзён наперад
-- /hourly — па гадзінах 24г
-
-🔍 ДЭТАЛІ:
-- /rain — дождж: імавернасць + мм
-- /wind — вецер + павевы ў м/с
-- /sun — усход, захад, даўжыня дня
-- /uv — УФ індэкс + парада
-- /air — якасць паветра AQI
-- /alerts — папярэджанні
-
-⏰ ЧАС:
-- /time — дакладны час у цябе
-- /dst — летні/зімовы + калі перавод
-
-📍 ЛАКАЦЫЯ:
-- /location — змяніць горад
-- /mylocation — дзе я зараз
-
-Націсні Share Location каб пачаць.
-Дадзеныя: Open-Meteo • Працую 24/7"""
+🌤 /current — зараз, /today, /tomorrow, /week, /hourly
+🔍 /rain, /wind м/с, /sun, /uv, /air, /alerts
+⏰ /time, /dst"""
 
 WELCOME_PL="""👋 Cześć! Jestem Twoim osobistym meteorologiem
-
-Pokazuję pogodę dokładniej niż iPhone i nigdy nie zapomnę o zmianie czasu.
+Pokazuję pogodę dokładniej niż iPhone.
 
 📍 CO POTRAFIĘ:
-
-🌤 POGODA:
-- /current — teraz: temperatura, odczuwalna, wilgotność
-- /today — szczegółowo dziś
-- /tomorrow — prognoza na jutro
-- /week — 7 dni naprzód
-- /hourly — co godzinę 24h
-
-🔍 SZCZEGÓŁY:
-- /rain — deszcz: prawdopodobieństwo + mm
-- /wind — wiatr + porywy w m/s
-- /sun — wschód, zachód, długość dnia
-- /uv — indeks UV + porada
-- /air — jakość powietrza AQI
-- /alerts — ostrzeżenia
-
-⏰ CZAS:
-- /time — dokładny czas u Ciebie
-- /dst — letni/zimowy + zmiana czasu
-
-📍 LOKALIZACJA:
-- /location — zmień miasto
-- /mylocation — gdzie jestem teraz
-
-Naciśnij Share Location aby zacząć.
-Dane: Open-Meteo • Pracuję 24/7"""
+🌤 /current, /today, /tomorrow, /week, /hourly
+🔍 /rain, /wind m/s, /sun, /uv, /air, /alerts
+⏰ /time, /dst"""
 
 WELCOME_DE="""👋 Hallo! Ich bin dein persönlicher Meteorologe
-
-Ich zeige Wetter genauer als iPhone und vergesse nie die Zeitumstellung.
+Ich zeige Wetter genauer als iPhone.
 
 📍 WAS ICH KANN:
-
-🌤 WETTER:
-- /current — jetzt: Temperatur, gefühlt, Feuchtigkeit
-- /today — detailliert heute
-- /tomorrow — Prognose morgen
-- /week — 7 Tage voraus
-- /hourly — stündlich 24h
-
-🔍 DETAILS:
-- /rain — Regen: Wahrscheinlichkeit + mm
-- /wind — Wind + Böen in m/s
-- /sun — Aufgang, Untergang, Tageslänge
-- /uv — UV-Index + Tipp
-- /air — Luftqualität AQI
-- /alerts — Warnungen
-
-⏰ ZEIT:
-- /time — deine genaue Zeit
-- /dst — Sommer/Winter + Umstellung
-
-📍 STANDORT:
-- /location — Stadt ändern
-- /mylocation — wo ich bin
-
-Drücke Share Location zum Starten.
-Daten: Open-Meteo • Arbeite 24/7"""
+🌤 /current, /today, /tomorrow, /week, /hourly
+🔍 /rain, /wind m/s, /sun, /uv, /air, /alerts
+⏰ /time, /dst"""
 
 WELCOME_FR="""👋 Salut! Je suis ton météorologue personnel
-
-Plus précis qu'iPhone, je n'oublie jamais le changement d'heure.
+Plus précis qu'iPhone.
 
 📍 CE QUE JE FAIS:
-
-🌤 MÉTÉO:
-- /current — maintenant: température, ressenti, humidité
-- /today — détaillé aujourd'hui
-- /tomorrow — prévision demain
-- /week — 7 jours à venir
-- /hourly — horaire 24h
-
-🔍 DÉTAILS:
-- /rain — pluie: probabilité + mm
-- /wind — vent + rafales en m/s
-- /sun — lever, coucher, durée du jour
-- /uv — indice UV + conseil
-- /air — qualité de l'air AQI
-- /alerts — alertes
-
-⏰ HEURE:
-- /time — ton heure exacte
-- /dst — été/hiver + changement
-
-📍 LIEU:
-- /location — changer de ville
-- /mylocation — où je suis
-
-Appuie sur Share Location pour commencer.
-Données: Open-Meteo • Fonctionne 24/7"""
+🌤 /current, /today, /tomorrow, /week, /hourly
+🔍 /rain, /wind m/s, /sun, /uv, /air, /alerts
+⏰ /time, /dst"""
 
 WELCOME_ES="""👋 Hola! Soy tu meteorólogo personal
-
-Más preciso que iPhone, nunca olvido el cambio de hora.
+Más preciso que iPhone.
 
 📍 QUÉ HAGO:
-
-🌤 CLIMA:
-- /current — ahora: temperatura, sensación, humedad
-- /today — detallado hoy
-- /tomorrow — pronóstico mañana
-- /week — 7 días adelante
-- /hourly — por horas 24h
-
-🔍 DETALLES:
-- /rain — lluvia: probabilidad + mm
-- /wind — viento + ráfagas en m/s
-- /sun — amanecer, atardecer, duración día
-- /uv — índice UV + consejo
-- /air — calidad aire AQI
-- /alerts — alertas
-
-⏰ HORA:
-- /time — tu hora exacta
-- /dst — verano/invierno + cambio
-
-📍 UBICACIÓN:
-- /location — cambiar ciudad
-- /mylocation — donde estoy
-
-Presiona Share Location para empezar.
-Datos: Open-Meteo • Trabajando 24/7"""
+🌤 /current, /today, /tomorrow, /week, /hourly
+🔍 /rain, /wind m/s, /sun, /uv, /air, /alerts
+⏰ /time, /dst"""
 
 WELCOME_IT="""👋 Ciao! Sono il tuo meteorologo personale
-
-Più preciso di iPhone, non dimentico mai l'ora legale.
+Più preciso di iPhone.
 
 📍 COSA SO FARE:
-
-🌤 METEO:
-- /current — ora: temperatura, percepita, umidità
-- /today — dettagliato oggi
-- /tomorrow — previsione domani
-- /week — 7 giorni avanti
-- /hourly — orario 24h
-
-🔍 DETTAGLI:
-- /rain — pioggia: probabilità + mm
-- /wind — vento + raffiche in m/s
-- /sun — alba, tramonto, durata giorno
-- /uv — indice UV + consiglio
-- /air — qualità aria AQI
-- /alerts — allerte
-
-⏰ ORA:
-- /time — tua ora esatta
-- /dst — legale/solare + cambio
-
-📍 POSIZIONE:
-- /location — cambia città
-- /mylocation — dove sono
-
-Premi Share Location per iniziare.
-Dati: Open-Meteo • Lavoro 24/7"""
+🌤 /current, /today, /tomorrow, /week, /hourly
+🔍 /rain, /wind m/s, /sun, /uv, /air, /alerts
+⏰ /time, /dst"""
 
 LANGS={
-"ru":{"welcome":WELCOME_RU,"weather_btn":"🌤 Погода","time_btn":"🕐 Время","loc_btn":"📍 Локация","help_btn":"❓ Помощь","back":"⬅️ Назад","choose_lang":"🌐 Выбери язык:","lang_saved":"✅ Язык: Русский","current_btn":"📍 Сейчас","today_btn":"📅 Сегодня","tomorrow_btn":"➡️ Завтра","week_btn":"📆 Неделя","hourly_btn":"⏰ По часам","rain_btn":"🌧 Дождь","wind_btn":"💨 Ветер","sun_btn":"🌅 Солнце","uv_btn":"☀️ УФ","air_btn":"🌿 Воздух","alerts_btn":"⚠️ Тревоги","now_txt":"Сейчас в","feels_txt":"Ощущается","humidity_txt":"Влажность","wind_txt":"Ветер","today_txt":"Сегодня","tomorrow_txt":"Завтра","week_txt":"7 дней","rain_txt":"Дождь","rise_txt":"Рассвет","set_txt":"Закат"},
-"en":{"welcome":WELCOME_EN,"weather_btn":"🌤 Whether commands","time_btn":"🕐 Time","loc_btn":"📍 Location","help_btn":"❓ Help","back":"⬅️ Back","choose_lang":"🌐 Choose language:","lang_saved":"✅ Language: English","current_btn":"📍 Current","today_btn":"📅 Today","tomorrow_btn":"➡️ Tomorrow","week_btn":"📆 Week","hourly_btn":"⏰ Hourly","rain_btn":"🌧 Rain","wind_btn":"💨 Wind","sun_btn":"🌅 Sun","uv_btn":"☀️ UV","air_btn":"🌿 Air","alerts_btn":"⚠️ Alerts","now_txt":"Now in","feels_txt":"Feels","humidity_txt":"Humidity","wind_txt":"Wind","today_txt":"Today","tomorrow_txt":"Tomorrow","week_txt":"7 days","rain_txt":"Rain","rise_txt":"Sunrise","set_txt":"Sunset"},
-"sr":{"welcome":WELCOME_SR,"weather_btn":"🌤 Време","time_btn":"🕐 Време","loc_btn":"📍 Локација","help_btn":"❓ Помоћ","back":"⬅️ Назад","choose_lang":"🌐 Изабери језик:","lang_saved":"✅ Језик: Српски","current_btn":"📍 Тренутно","today_btn":"📅 Данас","tomorrow_btn":"➡️ Сутра","week_btn":"📆 Недеља","hourly_btn":"⏰ По сатима","rain_btn":"🌧 Киша","wind_btn":"💨 Ветар","sun_btn":"🌅 Сунце","uv_btn":"☀️ УВ","air_btn":"🌿 Ваздух","alerts_btn":"⚠️ Упозорења","now_txt":"Сада у","feels_txt":"Осећај","humidity_txt":"Влага","wind_txt":"Ветар","today_txt":"Данас","tomorrow_txt":"Сутра","week_txt":"7 дана","rain_txt":"Киша","rise_txt":"Излазак","set_txt":"Залазак"},
-"uk":{"welcome":WELCOME_UK,"weather_btn":"🌤 Погода","time_btn":"🕐 Час","loc_btn":"📍 Локація","help_btn":"❓ Допомога","back":"⬅️ Назад","choose_lang":"🌐 Обери мову:","lang_saved":"✅ Мова: Українська","current_btn":"📍 Зараз","today_btn":"📅 Сьогодні","tomorrow_btn":"➡️ Завтра","week_btn":"📆 Тиждень","hourly_btn":"⏰ Погодинно","rain_btn":"🌧 Дощ","wind_btn":"💨 Вітер","sun_btn":"🌅 Сонце","uv_btn":"☀️ УФ","air_btn":"🌿 Повітря","alerts_btn":"⚠️ Тривоги","now_txt":"Зараз у","feels_txt":"Відчувається","humidity_txt":"Вологість","wind_txt":"Вітер","today_txt":"Сьогодні","tomorrow_txt":"Завтра","week_txt":"7 днів","rain_txt":"Дощ","rise_txt":"Схід","set_txt":"Захід"},
+"ru":{"welcome":WELCOME_RU,"weather_btn":"🌤 Погода","time_btn":"🕐 Время","loc_btn":"📍 Локация","help_btn":"❓ Помощь","back":"⬅️ Назад","choose_lang":"🌐 Выбери язык:","lang_saved":"✅ Русский","current_btn":"📍 Сейчас","today_btn":"📅 Сегодня","tomorrow_btn":"➡️ Завтра","week_btn":"📆 Неделя","hourly_btn":"⏰ По часам","rain_btn":"🌧 Дождь","wind_btn":"💨 Ветер","sun_btn":"🌅 Солнце","uv_btn":"☀️ УФ","air_btn":"🌿 Воздух","alerts_btn":"⚠️ Тревоги","now_txt":"Сейчас в","feels_txt":"Ощущается","humidity_txt":"Влажность","wind_txt":"Ветер","today_txt":"Сегодня","tomorrow_txt":"Завтра","week_txt":"7 дней","rain_txt":"Дождь","rise_txt":"Рассвет","set_txt":"Закат"},
+"en":{"welcome":WELCOME_EN,"weather_btn":"🌤 Whether commands","time_btn":"🕐 Time","loc_btn":"📍 Location","help_btn":"❓ Help","back":"⬅️ Back","choose_lang":"🌐 Choose language:","lang_saved":"✅ English","current_btn":"📍 Current","today_btn":"📅 Today","tomorrow_btn":"➡️ Tomorrow","week_btn":"📆 Week","hourly_btn":"⏰ Hourly","rain_btn":"🌧 Rain","wind_btn":"💨 Wind","sun_btn":"🌅 Sun","uv_btn":"☀️ UV","air_btn":"🌿 Air","alerts_btn":"⚠️ Alerts","now_txt":"Now in","feels_txt":"Feels","humidity_txt":"Humidity","wind_txt":"Wind","today_txt":"Today","tomorrow_txt":"Tomorrow","week_txt":"7 days","rain_txt":"Rain","rise_txt":"Sunrise","set_txt":"Sunset"},
+"sr":{"welcome":WELCOME_SR,"weather_btn":"🌤 Време","time_btn":"🕐 Време","loc_btn":"📍 Локација","help_btn":"❓ Помоћ","back":"⬅️ Назад","choose_lang":"🌐 Језик:","lang_saved":"✅ Српски","current_btn":"📍 Тренутно","today_btn":"📅 Данас","tomorrow_btn":"➡️ Сутра","week_btn":"📆 Недеља","hourly_btn":"⏰ По сатима","rain_btn":"🌧 Киша","wind_btn":"💨 Ветар","sun_btn":"🌅 Сунце","uv_btn":"☀️ УВ","air_btn":"🌿 Ваздух","alerts_btn":"⚠️ Упозорења","now_txt":"Сада у","feels_txt":"Осећај","humidity_txt":"Влага","wind_txt":"Ветар","today_txt":"Данас","tomorrow_txt":"Сутра","week_txt":"7 дана","rain_txt":"Киша","rise_txt":"Излазак","set_txt":"Залазак"},
+"uk":{"welcome":WELCOME_UK,"weather_btn":"🌤 Погода","time_btn":"🕐 Час","loc_btn":"📍 Локація","help_btn":"❓ Допомога","back":"⬅️ Назад","choose_lang":"🌐 Мова:","lang_saved":"✅ Українська","current_btn":"📍 Зараз","today_btn":"📅 Сьогодні","tomorrow_btn":"➡️ Завтра","week_btn":"📆 Тиждень","hourly_btn":"⏰ Погодинно","rain_btn":"🌧 Дощ","wind_btn":"💨 Вітер","sun_btn":"🌅 Сонце","uv_btn":"☀️ УФ","air_btn":"🌿 Повітря","alerts_btn":"⚠️ Тривоги","now_txt":"Зараз у","feels_txt":"Відчувається","humidity_txt":"Вологість","wind_txt":"Вітер","today_txt":"Сьогодні","tomorrow_txt":"Завтра","week_txt":"7 днів","rain_txt":"Дощ","rise_txt":"Схід","set_txt":"Захід"},
 "be":{"welcome":WELCOME_BE,"weather_btn":"🌤 Надвор'е","time_btn":"🕐 Час","loc_btn":"📍 Лакацыя","help_btn":"❓ Дапамога","back":"⬅️ Назад","choose_lang":"🌐 Мова:","lang_saved":"✅ Беларуская","current_btn":"📍 Зараз","today_btn":"📅 Сёння","tomorrow_btn":"➡️ Заўтра","week_btn":"📆 Тыдзень","hourly_btn":"⏰ Па гадзінах","rain_btn":"🌧 Дождж","wind_btn":"💨 Вецер","sun_btn":"🌅 Сонца","uv_btn":"☀️ УФ","air_btn":"🌿 Паветра","alerts_btn":"⚠️ Трывогі","now_txt":"Зараз у","feels_txt":"Адчуваецца","humidity_txt":"Вільготнасць","wind_txt":"Вецер","today_txt":"Сёння","tomorrow_txt":"Заўтра","week_txt":"7 дзён","rain_txt":"Дождж","rise_txt":"Усход","set_txt":"Захад"},
 "pl":{"welcome":WELCOME_PL,"weather_btn":"🌤 Pogoda","time_btn":"🕐 Czas","loc_btn":"📍 Lokalizacja","help_btn":"❓ Pomoc","back":"⬅️ Wróć","choose_lang":"🌐 Język:","lang_saved":"✅ Polski","current_btn":"📍 Teraz","today_btn":"📅 Dziś","tomorrow_btn":"➡️ Jutro","week_btn":"📆 Tydzień","hourly_btn":"⏰ Co godzinę","rain_btn":"🌧 Deszcz","wind_btn":"💨 Wiatr","sun_btn":"🌅 Słońce","uv_btn":"☀️ UV","air_btn":"🌿 Powietrze","alerts_btn":"⚠️ Alerty","now_txt":"Teraz w","feels_txt":"Odczuwalna","humidity_txt":"Wilgotność","wind_txt":"Wiatr","today_txt":"Dziś","tomorrow_txt":"Jutro","week_txt":"7 dni","rain_txt":"Deszcz","rise_txt":"Wschód","set_txt":"Zachód"},
 "de":{"welcome":WELCOME_DE,"weather_btn":"🌤 Wetter","time_btn":"🕐 Zeit","loc_btn":"📍 Standort","help_btn":"❓ Hilfe","back":"⬅️ Zurück","choose_lang":"🌐 Sprache:","lang_saved":"✅ Deutsch","current_btn":"📍 Jetzt","today_btn":"📅 Heute","tomorrow_btn":"➡️ Morgen","week_btn":"📆 Woche","hourly_btn":"⏰ Stündlich","rain_btn":"🌧 Regen","wind_btn":"💨 Wind","sun_btn":"🌅 Sonne","uv_btn":"☀️ UV","air_btn":"🌿 Luft","alerts_btn":"⚠️ Warnungen","now_txt":"Jetzt in","feels_txt":"Gefühlt","humidity_txt":"Feuchtigkeit","wind_txt":"Wind","today_txt":"Heute","tomorrow_txt":"Morgen","week_txt":"7 Tage","rain_txt":"Regen","rise_txt":"Aufgang","set_txt":"Untergang"},
@@ -358,16 +145,36 @@ LANGS={
 }
 
 def get_user(uid):
-    info=U.get(str(uid), {"lat":44.81,"lon":20.46,"timezone":"Europe/Belgrade","lang":"ru"})
-    if info.get("lang") not in LANGS: info["lang"]="ru"
+    info=U.get(str(uid), {"lat":44.81,"lon":20.46,"timezone":"Europe/Belgrade","lang":"be"})
+    if info.get("lang") not in LANGS: info["lang"]="be"
     return info
 def tr(uid,key):
-    lang=get_user(uid).get("lang","ru")
-    if lang not in LANGS: lang="ru"
+    lang=get_user(uid).get("lang","be")
+    if lang not in LANGS: lang="be"
     return LANGS[lang].get(key,key)
+
 def get_w(lat,lon):
-    url=f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset,uv_index_max,wind_speed_10m_max,wind_gusts_10m_max&hourly=temperature_2m,precipitation_probability&timezone=auto&forecast_days=7&wind_speed_unit=ms"
-    return requests.get(url,timeout=15).json()
+    # ПОЧИНЕНО: 2 попытки, вторая без wind_speed_unit
+    try:
+        url=f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset,uv_index_max,wind_speed_10m_max,wind_gusts_10m_max&hourly=temperature_2m,precipitation_probability&timezone=auto&forecast_days=7&wind_speed_unit=ms"
+        r=requests.get(url,timeout=15)
+        j=r.json()
+        if "current" in j:
+            return j
+        print("API FAIL 1:", j)
+    except Exception as e:
+        print("REQ ERR 1:", e)
+
+    # запасной запрос без ms
+    try:
+        url2=f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset,uv_index_max,wind_speed_10m_max,wind_gusts_10m_max&hourly=temperature_2m,precipitation_probability&timezone=auto&forecast_days=7"
+        r2=requests.get(url2,timeout=15)
+        j2=r2.json()
+        print("FALLBACK:", j2.keys())
+        return j2
+    except Exception as e:
+        print("REQ ERR 2:", e)
+        return {}
 
 def main_kb(uid):
     k=types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -409,15 +216,22 @@ def do_cmd(chat_id, uid, cmd):
             k.add(tr(uid,"back"))
             bot.send_message(chat_id, "📍 Поделись локацией:", reply_markup=k)
             return
+
         loc=get_user(uid)
         w=get_w(loc["lat"],loc["lon"])
-        if "current" not in w:
-            bot.send_message(chat_id, "API ошибка, попробуй /current еще раз")
+        if not w or "current" not in w:
+            bot.send_message(chat_id, f"Open-Meteo не отвечает, попробуй еще раз /current. Debug: {str(w)[:300]}")
             return
         c=w["current"]; d=w["daily"]
         L=LANGS.get(get_user(uid).get("lang","ru"),LANGS["ru"])
+        # конверт в м/с если пришло в км/ч
+        wind_ms = c['wind_speed_10m']
+        # если больше 20 - значит км/ч, делим
+        if wind_ms > 30:
+            wind_ms = round(wind_ms / 3.6, 1)
+
         txt=""
-        if cmd=="current": txt=f"📍 {L['now_txt']} {loc['timezone']}\n\n🌡 {c['temperature_2m']}°C\n{L['feels_txt']}: {c['apparent_temperature']}°C\n{L['humidity_txt']}: {c['relative_humidity_2m']}%\n{L['wind_txt']}: {c['wind_speed_10m']} м/с"
+        if cmd=="current": txt=f"📍 {L['now_txt']} {loc['timezone']}\n\n🌡 {c['temperature_2m']}°C\n{L['feels_txt']}: {c['apparent_temperature']}°C\n{L['humidity_txt']}: {c['relative_humidity_2m']}%\n{L['wind_txt']}: {wind_ms} м/с"
         elif cmd=="today": txt=f"📅 {L['today_txt']} {d['time'][0]} {d['temperature_2m_max'][0]}/{d['temperature_2m_min'][0]}°C {L['rain_txt']} {d['precipitation_probability_max'][0]}%"
         elif cmd=="tomorrow": txt=f"➡️ {L['tomorrow_txt']} {d['time'][1]} {d['temperature_2m_max'][1]}/{d['temperature_2m_min'][1]}°C"
         elif cmd=="week":
@@ -427,7 +241,7 @@ def do_cmd(chat_id, uid, cmd):
             h=w["hourly"]; txt="⏰\n"
             for i in range(12): txt+=f"{h['time'][i][11:]} {h['temperature_2m'][i]}°C {h['precipitation_probability'][i]}%\n"
         elif cmd=="rain": txt=f"🌧 {L['rain_txt']} {d['precipitation_probability_max'][0]}% {d['precipitation_sum'][0]}мм"
-        elif cmd=="wind": txt=f"💨 {L['wind_txt']}: {c['wind_speed_10m']} м/с\nПорывы: {d['wind_gusts_10m_max'][0]} м/с\nМакс: {d['wind_speed_10m_max'][0]} м/с"
+        elif cmd=="wind": txt=f"💨 {L['wind_txt']}: {wind_ms} м/с\nПорывы: {d['wind_gusts_10m_max'][0]} м/с\nМакс: {d['wind_speed_10m_max'][0]} м/с"
         elif cmd=="sun": txt=f"🌅 {L['rise_txt']}: {d['sunrise'][0][11:]}\n🌇 {L['set_txt']}: {d['sunset'][0][11:]}"
         elif cmd=="uv": txt=f"☀️ UV {d['uv_index_max'][0]}"
         elif cmd=="air": txt="🌿 Воздух — скоро"
@@ -438,7 +252,7 @@ def do_cmd(chat_id, uid, cmd):
         elif cmd=="mylocation": txt=f"{loc['lat']},{loc['lon']} {loc['timezone']}"
         bot.send_message(chat_id, txt, reply_markup=weather_kb(uid))
     except Exception as e:
-        print(f"ERR {cmd}: {e}")
+        import traceback; traceback.print_exc()
         bot.send_message(chat_id, f"Ошибка {cmd}: {e}")
 
 @bot.message_handler(commands=["start","current","today","tomorrow","week","hourly","rain","wind","sun","uv","air","alerts","time","dst","location","mylocation","language","lang","help"])
@@ -451,9 +265,9 @@ def all_commands(m):
 @bot.message_handler(content_types=["location"])
 def loc_h(m):
     w=get_w(m.location.latitude,m.location.longitude)
-    tz=w.get("timezone","Europe/Belgrade")
+    tz=w.get("timezone","Europe/Belgrade") if w else "Europe/Belgrade"
     uid=str(m.from_user.id)
-    cur=get_user(uid)
+    cur=get_user(m.from_user.id)
     cur.update({"lat":m.location.latitude,"lon":m.location.longitude,"timezone":tz})
     U[uid]=cur
     save()
@@ -496,7 +310,7 @@ def btn_h(m):
 app=Flask(__name__)
 @app.route("/")
 def home():
-    return "FINAL ALL 10 BEAUTIFUL WELCOMES"
+    return "FIXED API ERROR FALLBACK"
 def run_web():
     app.run(host="0.0.0.0",port=10000)
 threading.Thread(target=run_web,daemon=True).start()
