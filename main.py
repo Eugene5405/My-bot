@@ -4,13 +4,11 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from telebot import types
 from dotenv import load_dotenv
-
 load_dotenv()
 TOKEN=os.getenv("TOKEN")
 bot=telebot.TeleBot(TOKEN)
 bot.remove_webhook()
 time.sleep(1)
-
 FILE="locations.json"
 U={}
 if os.path.exists(FILE):
@@ -18,14 +16,12 @@ if os.path.exists(FILE):
         U=json.load(open(FILE,"r"))
     except:
         U={}
-
 def save():
     json.dump(U,open(FILE,"w"))
-
 LANGS={
-"en":{"name":"🇬🇧 English","welcome":"👋 *Hi! I'm your personal meteorologist*\n\n🌤 /current - now\n📅 /today /tomorrow /week /hourly\n🌧 /rain /wind /sun /uv /air /alerts\n⏰ /time /dst\n📍 /location\n\nPress *Weather commands* 👇","weather_btn":"🌤 Weather commands","time_btn":"⏰ Time & DST","loc_btn":"📍 Change Location","help_btn":"⚙️ Help","back":"⬅️ Back to main","choose_lang":"Choose language:","lang_saved":"✅ Language: English"},
-"ru":{"name":"🇷🇺 Русский","welcome":"👋 *Привет! Я твой метеоролог*\n\n🌤 /current - сейчас\n📅 /today /tomorrow /week /hourly\n🌧 /rain /wind /sun /uv /air /alerts\n⏰ /time /dst\n\nНажми *Weather commands* 👇","weather_btn":"🌤 Команды погоды","time_btn":"⏰ Время и DST","loc_btn":"📍 Сменить локацию","help_btn":"⚙️ Помощь","back":"⬅️ Назад","choose_lang":"Выбери язык:","lang_saved":"✅ Язык: Русский"},
-"uk":{"name":"🇺🇦 Українська","welcome":"👋 *Привіт! Я твій метеоролог*","weather_btn":"🌤 Команди погоди","time_btn":"⏰ Час і DST","loc_btn":"📍 Змінити локацію","help_btn":"⚙️ Допомога","back":"⬅️ Назад","choose_lang":"Обери мову:","lang_saved":"✅ Мова: Українська"},
+"en":{"name":"🇬🇧 English","welcome":"👋 *Hi! I'm your personal meteorologist*\n\nPress *Weather commands* 👇","weather_btn":"🌤 Weather commands","time_btn":"⏰ Time & DST","loc_btn":"📍 Change Location","help_btn":"⚙️ Help","back":"⬅️ Back to main","choose_lang":"Choose language:","lang_saved":"✅ Language: English"},
+"ru":{"name":"🇷🇺 Русский","welcome":"👋 *Привет! Я твой метеоролог*\n\nНажми *Weather commands* 👇","weather_btn":"🌤 Команды погоды","time_btn":"⏰ Время и DST","loc_btn":"📍 Сменить локацию","help_btn":"⚙️ Помощь","back":"⬅️ Назад","choose_lang":"Выбери язык:","lang_saved":"✅ Язык: Русский"},
+"uk":{"name":"🇺🇦 Українська","welcome":"👋 *Привіт!*","weather_btn":"🌤 Команди погоди","time_btn":"⏰ Час і DST","loc_btn":"📍 Змінити локацію","help_btn":"⚙️ Допомога","back":"⬅️ Назад","choose_lang":"Обери мову:","lang_saved":"✅ Мова: Українська"},
 "be":{"name":"🇧🇾 Беларуская","welcome":"👋 *Прывітанне!*","weather_btn":"🌤 Надвор'е","time_btn":"⏰ Час","loc_btn":"📍 Лакацыя","help_btn":"⚙️ Дапамога","back":"⬅️ Назад","choose_lang":"Выберы мову:","lang_saved":"✅ Беларуская"},
 "sr":{"name":"🇷🇸 Srpski","welcome":"👋 *Zdravo!*","weather_btn":"🌤 Vreme","time_btn":"⏰ Vreme i DST","loc_btn":"📍 Lokacija","help_btn":"⚙️ Pomoć","back":"⬅️ Nazad","choose_lang":"Jezik:","lang_saved":"✅ Srpski"},
 "pl":{"name":"🇵🇱 Polski","welcome":"👋 *Cześć!*","weather_btn":"🌤 Pogoda","time_btn":"⏰ Czas","loc_btn":"📍 Lokalizacja","help_btn":"⚙️ Pomoc","back":"⬅️ Wróć","choose_lang":"Język:","lang_saved":"✅ Polski"},
@@ -34,28 +30,23 @@ LANGS={
 "es":{"name":"🇪🇸 Español","welcome":"👋 *¡Hola!*","weather_btn":"🌤 Clima","time_btn":"⏰ Hora","loc_btn":"📍 Ubicación","help_btn":"⚙️ Ayuda","back":"⬅️ Atrás","choose_lang":"Idioma:","lang_saved":"✅ Español"},
 "it":{"name":"🇮🇹 Italiano","welcome":"👋 *Ciao!*","weather_btn":"🌤 Meteo","time_btn":"⏰ Ora","loc_btn":"📍 Posizione","help_btn":"⚙️ Aiuto","back":"⬅️ Indietro","choose_lang":"Lingua:","lang_saved":"✅ Italiano"}
 }
-
 def get_user(uid):
     d=U.get(str(uid),{"lat":44.81,"lon":20.46,"timezone":"Europe/Belgrade","lang":"en"})
     if "lang" not in d:
         d["lang"]="en"
     return d
-
 def tr(uid,key):
     lang=get_user(uid).get("lang","en")
     return LANGS.get(lang, LANGS["en"]).get(key, key)
-
 def get_w(lat,lon):
     u=f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset,uv_index_max,wind_speed_10m_max,wind_gusts_10m_max&hourly=temperature_2m,precipitation_probability&timezone=auto&forecast_days=7"
     return requests.get(u,timeout=10).json()
-
 def get_air(lat,lon):
     try:
         u=f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&current=european_aqi,us_aqi,pm2_5,pm10"
         return requests.get(u,timeout=10).json()["current"]
     except:
         return None
-
 def get_dst_info(tz_name):
     try:
         z=ZoneInfo(tz_name)
@@ -73,14 +64,12 @@ def get_dst_info(tz_name):
         return f"{tz_name}\n{status}"
     except Exception as e:
         return str(e)
-
 def main_kb(uid):
     k=types.ReplyKeyboardMarkup(resize_keyboard=True)
     k.row(tr(uid,"weather_btn"),tr(uid,"time_btn"))
     k.row(tr(uid,"loc_btn"),"🌐 Language")
     k.row(tr(uid,"help_btn"))
     return k
-
 def weather_kb(uid):
     k=types.ReplyKeyboardMarkup(resize_keyboard=True)
     k.row("🌤 Current","📅 Today","📆 Tomorrow")
@@ -89,7 +78,6 @@ def weather_kb(uid):
     k.row("☀️ Sun","🧴 UV","🌫 Air")
     k.row("🚨 Alerts",tr(uid,"back"))
     return k
-
 def lang_kb():
     k=types.InlineKeyboardMarkup(row_width=2)
     btns=[]
@@ -97,24 +85,21 @@ def lang_kb():
         btns.append(types.InlineKeyboardButton(info["name"],callback_data=f"lang_{code}"))
     k.add(*btns)
     return k
-
 def loc_kb(uid):
     k=types.ReplyKeyboardMarkup(resize_keyboard=True,one_time_keyboard=True)
     k.add(types.KeyboardButton("📍 Share Location",request_location=True))
     k.add(tr(uid,"back"))
     return k
-
 @bot.message_handler(commands=["start","help"])
 def start(m):
     uid=m.from_user.id
     lang=get_user(uid).get("lang","en")
     welcome=LANGS.get(lang, LANGS["en"])["welcome"]
     bot.send_message(m.chat.id,welcome,parse_mode="Markdown",reply_markup=main_kb(uid))
-  @bot.message_handler(commands=["lang","language"])
+    @bot.message_handler(commands=["lang","language"])
 def cmd_lang(m):
     uid=m.from_user.id
     bot.send_message(m.chat.id,tr(uid,"choose_lang"),reply_markup=lang_kb())
-
 @bot.callback_query_handler(func=lambda c:c.data.startswith("lang_"))
 def set_lang(c):
     code=c.data.replace("lang_","")
@@ -128,7 +113,6 @@ def set_lang(c):
     bot.send_message(c.message.chat.id,saved,reply_markup=main_kb(c.from_user.id))
     welcome=LANGS[code]["welcome"]
     bot.send_message(c.message.chat.id,welcome,parse_mode="Markdown",reply_markup=main_kb(c.from_user.id))
-
 @bot.message_handler(content_types=["location"])
 def loc_h(m):
     w=get_w(m.location.latitude,m.location.longitude)
@@ -138,7 +122,6 @@ def loc_h(m):
     U[uid]={"lat":m.location.latitude,"lon":m.location.longitude,"timezone":tz,"lang":old.get("lang","en")}
     save()
     bot.send_message(m.chat.id,f"✅ {tz}\n{get_dst_info(tz)}",reply_markup=main_kb(m.from_user.id))
-
 @bot.message_handler(commands=["current","today","tomorrow","week","hourly","rain","wind","sun","uv","air","alerts","time","dst","location","mylocation"])
 def profi(m):
     uid=m.from_user.id
@@ -185,7 +168,6 @@ def profi(m):
         txt=f"📍 {loc['lat']},{loc['lon']}\n{loc['timezone']}"
     kb=weather_kb(uid) if cmd in ["current","today","tomorrow","week","hourly","rain","wind","sun","uv","air","alerts"] else main_kb(uid)
     bot.send_message(m.chat.id,txt,reply_markup=kb)
-
 @bot.message_handler(func=lambda m:True)
 def buttons(m):
     uid=m.from_user.id
@@ -230,15 +212,12 @@ def buttons(m):
     if "Alerts" in t:
         m.text="/alerts"; return profi(m)
     bot.send_message(m.chat.id,"Menu 👇",reply_markup=main_kb(uid))
-
 app=Flask(__name__)
 @app.route("/")
 def home():
-    return "FINAL OK"
-
+    return "FINAL FIXED OK"
 def run_web():
     app.run(host="0.0.0.0",port=10000)
-
 threading.Thread(target=run_web,daemon=True).start()
 while True:
     try:
