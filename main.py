@@ -105,4 +105,22 @@ def all_text(m):
     if t == "Wind":
         loc = get_loc(m.from_user.id)
         w = get_weather(loc['lat'], loc['lon'])
-        bot.send_message(m.chat.id, f"
+        bot.send_message(m.chat.id, f"Wind now {w['current']['wind_speed_10m']} km/h max {w['daily']['wind_speed_10m_max'][0]}", reply_markup=weather_kb())
+        return
+    if t in ["7-day forecast", "Hourly", "Tomorrow", "Rain forecast", "Air quality", "UV index", "Sun times", "Weather alerts"]:
+        loc = get_loc(m.from_user.id)
+        w = get_weather(loc['lat'], loc['lon'])
+        bot.send_message(m.chat.id, f"{t} - data ready: {w['timezone']}", reply_markup=weather_kb())
+        return
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Bot is running"
+
+def run_web():
+    app.run(host='0.0.0.0', port=10000)
+
+threading.Thread(target=run_web, daemon=True).start()
+bot.infinity_polling()
