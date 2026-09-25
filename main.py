@@ -9,11 +9,11 @@ from bot.dst.handler import time_handler, dst_handler
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 flask_app = Flask(__name__)
 @flask_app.route('/')
-def home(): return "Bot OK 10 lang + lang button"
+def home(): return "Bot OK weather menu"
 def run_flask(): flask_app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 10000)))
 
 try:
-    from bot.weather.handler import current_handler, today_handler, week_handler
+    from bot.weather.handler import current_handler, today_handler, week_handler, tomorrow_handler, hourly_handler
     HAS_WEATHER = True
 except:
     HAS_WEATHER = False
@@ -24,41 +24,59 @@ def lang_keyboard():
     btns = [InlineKeyboardButton(v, callback_data=f"setlang_{k}") for k,v in LANGS.items()]
     return InlineKeyboardMarkup([btns[i:i+2] for i in range(0, len(btns), 2)])
 
+def weather_menu_keyboard(lang_code):
+    # Меню всех погодных команд
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("🌤 Сейчас /current", callback_data="weather_current"), InlineKeyboardButton("📅 Сегодня /today", callback_data="weather_today")],
+        [InlineKeyboardButton("🌙 Завтра /tomorrow", callback_data="weather_tomorrow"), InlineKeyboardButton("📆 Неделя /week", callback_data="weather_week")],
+        [InlineKeyboardButton("⏰ По часам /hourly", callback_data="weather_hourly"), InlineKeyboardButton("🌧 Дождь /rain", callback_data="weather_rain")],
+        [InlineKeyboardButton("💨 Ветер /wind", callback_data="weather_wind"), InlineKeyboardButton("🌅 Солнце /sun", callback_data="weather_sun")],
+        [InlineKeyboardButton("☀️ UV /uv", callback_data="weather_uv"), InlineKeyboardButton("🌫 Воздух /air", callback_data="weather_air")],
+        [InlineKeyboardButton("⚠️ Warnings /alerts", callback_data="weather_alerts")],
+    ])
+
 def main_keyboard(lang_code):
-    data = ALL_LANGUAGES.get(lang_code, ALL_LANGUAGES["en"])
-    b = data["buttons"]
+    d = ALL_LANGUAGES.get(lang_code, ALL_LANGUAGES["en"])["buttons"]
     kb = [
-        [KeyboardButton(b["share"], request_location=True)],
-        [KeyboardButton(b["time"]), KeyboardButton(b["dst"])],
-        [KeyboardButton(b["today"]), KeyboardButton(b["week"])],
-        [KeyboardButton("🌐 Language / Язык"), KeyboardButton("/current")],
+        [KeyboardButton(d["share"], request_location=True)],
+        [KeyboardButton(d["time"]), KeyboardButton(d["dst"])],
+        [KeyboardButton("🌤 Погода / Weather"), KeyboardButton(d["today"])],
+        [KeyboardButton(d["week"]), KeyboardButton("🌐 Language")],
     ]
     return ReplyKeyboardMarkup(kb, resize_keyboard=True)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    uid = update.effective_user.id
-    lang = get_user_lang(uid)
-    if lang not in ALL_LANGUAGES:
-        await update.message.reply_text("👋 Choose your language / Выбери язык:", reply_markup=lang_keyboard())
-        return
-    data = ALL_LANGUAGES[lang]
-    await update.message.reply_text(data["greeting"], reply_markup=main_keyboard(lang))
+    await update.message.reply_text("👋 Choose language / Выбери язык / Izaberi jezik:", reply_markup=lang_keyboard())
 
 async def lang_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("🌐 Choose language / Выбери язык:", reply_markup=lang_keyboard())
+    await update.message.reply_text("🌐 Choose language:", reply_markup=lang_keyboard())
 
 async def lang_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     lang = query.data.split("_")[1]
-    set_user_lang(update.effective_user.id, lang)
-    data = ALL_LANGUAGES[lang]
+    set_user_lang(query.from_user.id, lang)
+    data = ALL_LANGUAGES.get(lang, ALL_LANGUAGES["en"])
     await query.edit_message_text(f"✅ {LANGS[lang]}")
     await context.bot.send_message(chat_id=query.message.chat_id, text=data["greeting"], reply_markup=main_keyboard(lang))
 
-async def location_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def weather_button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     lang = get_user_lang(update.effective_user.id)
-    await update.message.reply_text(f"📍 Got location! Now try /current")
+    await update.message.reply_text("🌤 Выбери команду погоды / Choose weather command:", reply_markup=weather_menu_keyboard(lang))
+
+async def weather_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    cmd = query.data.split("_")[1]
+    # Вызываем реальные хендлеры если есть
+    if HAS_WEATHER:
+        fake_update = update
+        if cmd == "current": await current_handler(update, context)
+        elif cmd == "today": await today_handler(update, context)
+        elif cmd == "week": await week_handler(update, context)
+        else: await query.message.reply_text(f"Команда /{cmd} скоро будет подключена!")
+    else:
+        await query.message.reply_text(f"Нажми /{cmd} - погода в разработке. Скинь мне файл weather/handler.py чтобы я подключил!")
 
 def main():
     try: asyncio.get_event_loop()
@@ -70,16 +88,17 @@ def main():
     app.add_handler(CommandHandler("language", lang_command))
     app.add_handler(CommandHandler("lang", lang_command))
     app.add_handler(CallbackQueryHandler(lang_callback, pattern="^setlang_"))
+    app.add_handler(CallbackQueryHandler(weather_callback, pattern="^weather_"))
     app.add_handler(CommandHandler("time", time_handler))
     app.add_handler(CommandHandler("dst", dst_handler))
     if HAS_WEATHER:
         app.add_handler(CommandHandler("current", current_handler))
         app.add_handler(CommandHandler("today", today_handler))
         app.add_handler(CommandHandler("week", week_handler))
-    # Кнопка "Language" текстом
-    app.add_handler(MessageHandler(filters.Regex("^(🌐 Language|Language|Язык)"), lang_command))
-    app.add_handler(MessageHandler(filters.LOCATION, location_handler))
-    print("Bot with language switch button!")
+    # Кнопки текстом
+    app.add_handler(MessageHandler(filters.Regex("^(🌤 Погода|Weather|Погода)"), weather_button_handler))
+    app.add_handler(MessageHandler(filters.Regex("Language"), lang_command))
+    print("Bot: weather menu ready!")
     app.run_polling()
 
 if __name__ == "__main__": main()
