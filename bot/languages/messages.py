@@ -1,4 +1,4 @@
-Принято! 10 языков: RU, FR, BE, UK, EN, IT, DE, SR, ES, PL
+#Принято! 10 языков: RU, FR, BE, UK, EN, IT, DE, SR, ES, PL
 
 И твое приветствие переведено на все 10. Вставляй это в bot/languages/messages.py ЦЕЛИКОМ:
 # bot/languages/messages.py - 10 ЯЗЫКОВ
