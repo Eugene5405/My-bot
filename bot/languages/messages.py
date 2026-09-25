@@ -362,4 +362,4 @@ Dane: Open-Meteo + WeatherAPI • 24/7""",
 GREETINGS = {k: v["greeting"] for k, v in ALL_LANGUAGES.items()}
 TIME_MSG = {k: v["time"] for k, v in ALL_LANGUAGES.items()}
 DST_MSG = {k: v["dst"] for k, v in ALL_LANGUAGES.items()}
-BUTTONS = {k: v["buttons"] for k, v in ALL_LANGUAGES.items()
+BUTTONS = {k: v["buttons"] for k, v in ALL_LANGUAGES.items()}
