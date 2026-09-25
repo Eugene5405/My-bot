@@ -29,16 +29,10 @@ flask_app = Flask(__name__)
 def home(): return "Bot OK"
 def run_flask(): flask_app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 10000)))
 
-LANGS = {
-    "en":"English","ru":"Russian","fr":"Francais","be":"Belaruskaya",
-    "uk":"Ukrainska","it":"Italiano","de":"Deutsch","sr":"Srpski",
-    "es":"Espanol","pl":"Polski"
-}
 REVERSE = {
-    "🇬🇧 English":"en","🇷🇺 Русский":"ru","🇫🇷 Français":"fr","🇧🇾 Беларуская":"be",
-    "🇺🇦 Українська":"uk","🇮🇹 Italiano":"it","🇩🇪 Deutsch":"de","🇷🇸 Srpski":"sr",
-    "🇪🇸 Español":"es","🇵🇱 Polski":"pl",
-    "English":"en","Russian":"ru","Deutsch":"de"
+    "English":"en","Русский":"ru","Francais":"fr","Беларуская":"be",
+    "Українська":"uk","Italiano":"it","Deutsch":"de","Srpski":"sr",
+    "Español":"es","Polski":"pl"
 }
 
 BOTTOM = {
@@ -57,17 +51,17 @@ BOTTOM = {
 WEATHER_BT = {
     "en": ["Now","Today","Tomorrow","7 days","Hourly","Rain","Wind","Sunrise","UV","Air","Alerts"],
     "ru": ["Sejchas","Segodnya","Zavtra","7 dnej","Po chasam","Dozhd","Veter","Voshod","UV","Vozduh","Predupr"],
+    "de": ["Jetzt","Heute","Morgen","7 Tage","Stuendlich","Regen","Wind","Sonnenauf","UV","Luft","Warnungen"],
     "fr": ["Maintenant","Aujourd","Demain","7 jours","Par heure","Pluie","Vent","Lever","UV","Air","Alertes"],
     "be": ["Tsyaper","Syonnya","Zawtra","7 dzyon","Pa gadzinah","Dozhdzh","Vetser","Ushod","UV","Pavetra","Papyar"],
     "uk": ["Zaraz","Syogodni","Zavtra","7 dniv","Po godynah","Doshch","Viter","Shid","UV","Povitrya","Popered"],
     "it": ["Ora","Oggi","Domani","7 giorni","Orario","Pioggia","Vento","Alba","UV","Aria","Avvisi"],
-    "de": ["Jetzt","Heute","Morgen","7 Tage","Stuendlich","Regen","Wind","Sonnenauf","UV","Luft","Warnungen"],
     "sr": ["Trenutno","Danas","Sutra","7 dana","Po satima","Kisa","Vetar","Izlazak","UV","Vazduh","Upozorenja"],
     "es": ["Ahora","Hoy","Manana","7 dias","Por horas","Lluvia","Viento","Amanecer","UV","Aire","Alertas"],
     "pl": ["Teraz","Dzis","Jutro","7 dni","Godzinowa","Deszcz","Wiatr","Wschod","UV","Powietrze","Ostrzezenia"],
 }
 
-def lang_keyboard():
+def lang_kb():
     return ReplyKeyboardMarkup([
         [KeyboardButton("🇬🇧 English"), KeyboardButton("🇷🇺 Русский")],
         [KeyboardButton("🇫🇷 Français"), KeyboardButton("🇧🇾 Беларуская")],
@@ -99,7 +93,7 @@ def weather_kb(lang):
     ], resize_keyboard=True)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Choose language:", reply_markup=lang_keyboard())
+    await update.message.reply_text("Choose language:", reply_markup=lang_kb())
 
 async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     lang = get_user_lang(update.effective_user.id)
@@ -108,8 +102,10 @@ async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def router(update: Update, context: ContextTypes.DEFAULT_TYPE):
     txt = (update.message.text or "").strip()
-    if txt in REVERSE:
-        lang = REVERSE[txt]
+    # lang select
+    clean_txt = txt.replace("🇬🇧 ","").replace("🇷🇺 ","").replace("🇫🇷 ","").replace("🇧🇾 ","").replace("🇺🇦 ","").replace("🇮🇹 ","").replace("🇩🇪 ","").replace("🇷🇸 ","").replace("🇪🇸 ","").replace("🇵🇱 ","")
+    if clean_txt in REVERSE:
+        lang = REVERSE[clean_txt]
         set_user_lang(update.effective_user.id, lang)
         data = ALL_LANGUAGES.get(lang, ALL_LANGUAGES["en"])
         await update.message.reply_text(f"OK {txt}", reply_markup=main_kb(lang))
@@ -119,39 +115,23 @@ async def router(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bt = BOTTOM.get(lang, BOTTOM["en"])
     wb = WEATHER_BT.get(lang, WEATHER_BT["en"])
 
-    if txt.lower() in ["back","nazad","retour","zurueck","atras","wstecz","indietro"]:
+    if txt.lower() in ["back","nazad","retour","zurueck","atras","wstecz","indietro","pomeranje"]:
         await help_cmd(update, context); return
-    if txt.lower() in [v.lower() for v in BOTTOM[lang].values() if "weather" in v.lower() or "pogoda" in v.lower() or "wetter" in v.lower() or "meteo" in v.lower() or "clima" in v.lower() or "vreme" in v.lower()]:
-        await update.message.reply_text("Weather:", reply_markup=weather_kb(lang)); return
-    # прямое совпадение кнопки погоды
+
     for l in BOTTOM.values():
         if txt == l["weather"]:
-            await update.message.reply_text("Weather:", reply_markup=weather_kb(lang)); return
+            await update.message.reply_text("Weather menu:", reply_markup=weather_kb(lang)); return
 
     if txt in wb:
         i = wb.index(txt)
-        if i==0: await current_handler(update, context)
-        elif i==1: await today_handler(update, context)
-        elif i==2: await tomorrow_handler(update, context)
-        elif i==3: await week_handler(update, context)
-        elif i==4: await hourly_handler(update, context)
-        elif i==5: await rain_handler(update, context)
-        elif i==6: await wind_handler(update, context)
-        elif i==7: await sun_handler(update, context)
-        elif i==8: await uv_handler(update, context)
-        elif i==9: await air_handler(update, context)
-        elif i==10: await alerts_handler(update, context)
+        handlers = [current_handler, today_handler, tomorrow_handler, week_handler, hourly_handler, rain_handler, wind_handler, sun_handler, uv_handler, air_handler, alerts_handler]
+        await handlers[i](update, context)
         return
 
     if txt == bt["time"]: await time_handler(update, context); return
     if txt == bt["dst"]: await dst_handler(update, context); return
-    if txt == bt["lang"]: await update.message.reply_text("Lang:", reply_markup=lang_keyboard()); return
+    if txt == bt["lang"]: await update.message.reply_text("Lang:", reply_markup=lang_kb()); return
     if txt == bt["help"]: await help_cmd(update, context); return
-    if "Share" in txt or "location" in txt.lower(): await update.message.reply_text("Send location"); return
-
-    # если текст содержит слово погода на любом языке
-    if txt.lower() in ["pogoda","weather","wetter","meteo","clima","vreme"]:
-        await update.message.reply_text("Weather:", reply_markup=weather_kb(lang)); return
 
     if update.message.location:
         context.user_data["lat"]=update.message.location.latitude
@@ -162,6 +142,7 @@ def main():
     try: asyncio.get_event_loop()
     except: asyncio.set_event_loop(asyncio.new_event_loop())
     threading.Thread(target=run_flask, daemon=True).start()
+    if not BOT_TOKEN: print("No BOT_TOKEN"); return
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_cmd))
@@ -170,7 +151,7 @@ def main():
     app.add_handler(CommandHandler("current", current_handler))
     app.add_handler(MessageHandler(filters.LOCATION, current_handler))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, router))
-    print("Bot fixed no emoji")
-    app.run_polling()
+    print("Bot fixed no emoji - with anti conflict")
+    app.run_polling(drop_pending_updates=True, allowed_updates=Update.ALL_TYPES)
 
 if __name__=="__main__": main()
