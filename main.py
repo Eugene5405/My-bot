@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TOKEN=os.getenv("TOKEN")
+WAPI_KEY=os.getenv("WEATHERAPI_KEY") # <-- добавь на Render
 bot=telebot.TeleBot(TOKEN)
 bot.remove_webhook()
 
@@ -15,13 +16,14 @@ U={}
 if os.path.exists(FILE):
     try:
         U=json.load(open(FILE,"r",encoding="utf-8"))
-        for uid in list(U.keys()):
-            if U[uid].get("lang") not in ["ru","en","sr","uk","be","pl","de","fr","es","it"]:
-                U[uid]["lang"]="ru"
     except:
         U={}
 def save():
     json.dump(U,open(FILE,"w",encoding="utf-8"),ensure_ascii=False)
+
+# КЭШ 10 минут - чтобы не улетать в лимиты
+CACHE={}
+CACHE_TTL=600
 
 WELCOME_RU="""👋 Привет! Я твой персональный метеоролог
 
@@ -30,106 +32,222 @@ WELCOME_RU="""👋 Привет! Я твой персональный метео
 📍 ЧТО Я УМЕЮ:
 
 🌤 ПОГОДА:
-/current — сейчас: температура, ощущается, влажность
-/today — подробно на сегодня
-/tomorrow — прогноз на завтра
-/week — 7 дней вперед
-/hourly — по часам на 24ч
+- /current — сейчас: температура, ощущается, влажность
+- /today — подробно на сегодня
+- /tomorrow — прогноз на завтра
+- /week — 7 дней вперед
+- /hourly — по часам на 24ч
 
 🔍 ДЕТАЛИ:
-/rain — дождь: вероятность + мм
-/wind — ветер + порывы в м/с
-/sun — рассвет, закат, долгота дня
-/uv — UV индекс + совет
-/air — качество воздуха AQI
-/alerts — предупреждения
+- /rain — дождь: вероятность + мм
+- /wind — ветер + порывы в м/с
+- /sun — рассвет, закат, долгота дня
+- /uv — UV индекс + совет
+- /air — качество воздуха AQI
+- /alerts — предупреждения
 
 ⏰ ВРЕМЯ:
-/time — точное время у тебя
-/dst — летнее/зимнее + когда перевод
+- /time — точное время у тебя
+- /dst — летнее/зимнее + когда перевод
 
 📍 ЛОКАЦИЯ:
-/location — сменить город
-/mylocation — где я сейчас
+- /location — сменить город
+- /mylocation — где я сейчас
 
 Нажми Share Location чтобы начать.
-Данные: Open-Meteo • Работаю 24/7"""
+Данные: Open-Meteo + WeatherAPI • Работаю 24/7"""
 
 WELCOME_EN="""👋 Hi! I'm your personal meteorologist
+
 I show weather more accurate than iPhone, and I never forget DST.
 
 📍 WHAT I CAN DO:
-🌤 /current — now, /today, /tomorrow, /week, /hourly
-🔍 /rain, /wind m/s, /sun, /uv, /air, /alerts
-⏰ /time, /dst
-📍 /location, /mylocation
 
-Press Share Location to start."""
+🌤 WEATHER:
+- /current — now: temp, feels like, humidity
+- /today — detailed today
+- /tomorrow — tomorrow forecast
+- /week — 7 days ahead
+- /hourly — hourly 24h
+
+🔍 DETAILS:
+- /rain — rain: chance + mm
+- /wind — wind + gusts in m/s
+- /sun — sunrise, sunset, day length
+- /uv — UV index + advice
+- /air — air quality AQI
+- /alerts — warnings
+
+⏰ TIME:
+- /time — your exact time
+- /dst — summer/winter + DST change
+
+📍 LOCATION:
+- /location — change city
+- /mylocation — where I am
+
+Press Share Location to start.
+Data: Open-Meteo + WeatherAPI • Working 24/7"""
 
 WELCOME_SR="""👋 Здраво! Ја сам твој лични метеоролог
-Показујем време тачније од iPhone-а и никад не заборављам летње/зимско.
+
+Показујем време тачније од iPhone-а и никад не заборављам летње/зимско рачунање.
 
 📍 ШТА УМЕМ:
-🌤 /current — сада, /today, /tomorrow, /week, /hourly
-🔍 /rain, /wind m/s, /sun, /uv, /air, /alerts
-⏰ /time, /dst
-📍 /location, /mylocation"""
+
+🌤 ВРЕМЕ:
+- /current — сада: температура, осећај, влажност
+- /today — детаљно за данас
+- /tomorrow — прогноза за сутра
+- /week — 7 дана унапред
+- /hourly — по сатима 24ч
+
+🔍 ДЕТАЉИ:
+- /rain — киша: вероватноћа + мм
+- /wind — ветар + удари у м/с
+- /sun — излазак, залазак, дужина дана
+- /uv — УВ индекс + савет
+- /air — квалитет ваздуха AQI
+- /alerts — упозорења
+
+⏰ ВРЕМЕ:
+- /time — тачно време код тебе
+- /dst — летње/зимско + када је промена"""
 
 WELCOME_UK="""👋 Привіт! Я твій персональний метеоролог
-Покажу погоду точніше за iPhone і ніколи не забуду про переведення.
+
+Покажу погоду точніше за iPhone і ніколи не забуду про переведення годинника.
 
 📍 ЩО ВМІЮ:
-🌤 /current — зараз, /today, /tomorrow, /week, /hourly
-🔍 /rain, /wind м/с, /sun, /uv, /air, /alerts
-⏰ /time, /dst"""
+
+🌤 ПОГОДА:
+- /current — зараз: температура, відчувається, вологість
+- /today — детально на сьогодні
+- /tomorrow — прогноз на завтра
+- /week — 7 днів вперед
+- /hourly — по годинах 24г
+
+🔍 ДЕТАЛІ:
+- /rain — дощ: ймовірність + мм
+- /wind — вітер + пориви у м/с
+- /sun — схід, захід, довгота дня
+- /uv — УФ індекс + порада
+- /air — якість повітря AQI
+- /alerts — попередження"""
 
 WELCOME_BE="""👋 Прывітанне! Я твой персанальны метэаролаг
-Пакажу надвор'е дакладней чым iPhone.
+
+Пакажу надвор'е дакладней чым iPhone і ніколі не забуду пра перавод гадзінніка.
 
 📍 ШТО ЎМЕЮ:
-🌤 /current — зараз, /today, /tomorrow, /week, /hourly
-🔍 /rain, /wind м/с, /sun, /uv, /air, /alerts
-⏰ /time, /dst"""
+
+🌤 НАДВОР'Е:
+- /current — зараз: тэмпература, адчуваецца, вільготнасць
+- /today — падрабязна на сёння
+- /tomorrow — прагноз на заўтра
+- /week — 7 дзён наперад
+- /hourly — па гадзінах 24г
+
+🔍 ДЭТАЛІ:
+- /rain — дождж: імавернасць + мм
+- /wind — вецер + павевы ў м/с
+- /sun — усход, захад, даўжыня дня
+- /uv — УФ індэкс + парада"""
 
 WELCOME_PL="""👋 Cześć! Jestem Twoim osobistym meteorologiem
-Pokazuję pogodę dokładniej niż iPhone.
+
+Pokazuję pogodę dokładniej niż iPhone i nigdy nie zapomnę o zmianie czasu.
 
 📍 CO POTRAFIĘ:
-🌤 /current, /today, /tomorrow, /week, /hourly
-🔍 /rain, /wind m/s, /sun, /uv, /air, /alerts
-⏰ /time, /dst"""
+
+🌤 POGODA:
+- /current — teraz: temperatura, odczuwalna, wilgotność
+- /today — szczegółowo dziś
+- /tomorrow — prognoza na jutro
+- /week — 7 dni naprzód
+- /hourly — co godzinę 24h
+
+🔍 SZCZEGÓŁY:
+- /rain — deszcz: prawdopodobieństwo + mm
+- /wind — wiatr + porywy w m/s
+- /sun — wschód, zachód, długość dnia
+- /uv — indeks UV + porada"""
 
 WELCOME_DE="""👋 Hallo! Ich bin dein persönlicher Meteorologe
-Ich zeige Wetter genauer als iPhone.
+
+Ich zeige Wetter genauer als iPhone und vergesse nie die Zeitumstellung.
 
 📍 WAS ICH KANN:
-🌤 /current, /today, /tomorrow, /week, /hourly
-🔍 /rain, /wind m/s, /sun, /uv, /air, /alerts
-⏰ /time, /dst"""
+
+🌤 WETTER:
+- /current — jetzt: Temperatur, gefühlt, Feuchtigkeit
+- /today — detailliert heute
+- /tomorrow — Prognose morgen
+- /week — 7 Tage voraus
+- /hourly — stündlich 24h
+
+🔍 DETAILS:
+- /rain — Regen: Wahrscheinlichkeit + mm
+- /wind — Wind + Böen in m/s
+- /sun — Aufgang, Untergang, Tageslänge
+- /uv — UV-Index + Tipp"""
 
 WELCOME_FR="""👋 Salut! Je suis ton météorologue personnel
-Plus précis qu'iPhone.
+
+Plus précis qu'iPhone, je n'oublie jamais le changement d'heure.
 
 📍 CE QUE JE FAIS:
-🌤 /current, /today, /tomorrow, /week, /hourly
-🔍 /rain, /wind m/s, /sun, /uv, /air, /alerts
-⏰ /time, /dst"""
+
+🌤 MÉTÉO:
+- /current — maintenant: température, ressenti, humidité
+- /today — détaillé aujourd'hui
+- /tomorrow — prévision demain
+- /week — 7 jours à venir
+- /hourly — horaire 24h
+
+🔍 DÉTAILS:
+- /rain — pluie: probabilité + mm
+- /wind — vent + rafales en m/s
+- /sun — lever, coucher, durée du jour
+- /uv — indice UV + conseil"""
 
 WELCOME_ES="""👋 Hola! Soy tu meteorólogo personal
-Más preciso que iPhone.
+
+Más preciso que iPhone, nunca olvido el cambio de hora.
 
 📍 QUÉ HAGO:
-🌤 /current, /today, /tomorrow, /week, /hourly
-🔍 /rain, /wind m/s, /sun, /uv, /air, /alerts
-⏰ /time, /dst"""
+
+🌤 CLIMA:
+- /current — ahora: temperatura, sensación, humedad
+- /today — detallado hoy
+- /tomorrow — pronóstico mañana
+- /week — 7 días adelante
+- /hourly — por horas 24h
+
+🔍 DETALLES:
+- /rain — lluvia: probabilidad + mm
+- /wind — viento + ráfagas en m/s
+- /sun — amanecer, atardecer, duración día
+- /uv — índice UV + consejo"""
 
 WELCOME_IT="""👋 Ciao! Sono il tuo meteorologo personale
-Più preciso di iPhone.
+
+Più preciso di iPhone, non dimentico mai l'ora legale.
 
 📍 COSA SO FARE:
-🌤 /current, /today, /tomorrow, /week, /hourly
-🔍 /rain, /wind m/s, /sun, /uv, /air, /alerts
-⏰ /time, /dst"""
+
+🌤 METEO:
+- /current — ora: temperatura, percepita, umidità
+- /today — dettagliato oggi
+- /tomorrow — previsione domani
+- /week — 7 giorni avanti
+- /hourly — orario 24h
+
+🔍 DETTAGLI:
+- /rain — pioggia: probabilità + mm
+- /wind — vento + raffiche in m/s
+- /sun — alba, tramonto, durata giorno
+- /uv — indice UV + consiglio"""
 
 LANGS={
 "ru":{"welcome":WELCOME_RU,"weather_btn":"🌤 Погода","time_btn":"🕐 Время","loc_btn":"📍 Локация","help_btn":"❓ Помощь","back":"⬅️ Назад","choose_lang":"🌐 Выбери язык:","lang_saved":"✅ Русский","current_btn":"📍 Сейчас","today_btn":"📅 Сегодня","tomorrow_btn":"➡️ Завтра","week_btn":"📆 Неделя","hourly_btn":"⏰ По часам","rain_btn":"🌧 Дождь","wind_btn":"💨 Ветер","sun_btn":"🌅 Солнце","uv_btn":"☀️ УФ","air_btn":"🌿 Воздух","alerts_btn":"⚠️ Тревоги","now_txt":"Сейчас в","feels_txt":"Ощущается","humidity_txt":"Влажность","wind_txt":"Ветер","today_txt":"Сегодня","tomorrow_txt":"Завтра","week_txt":"7 дней","rain_txt":"Дождь","rise_txt":"Рассвет","set_txt":"Закат"},
@@ -145,36 +263,109 @@ LANGS={
 }
 
 def get_user(uid):
-    info=U.get(str(uid), {"lat":44.81,"lon":20.46,"timezone":"Europe/Belgrade","lang":"be"})
-    if info.get("lang") not in LANGS: info["lang"]="be"
+    info=U.get(str(uid), {"lat":44.81,"lon":20.46,"timezone":"Europe/Belgrade","lang":"ru"})
+    if info.get("lang") not in LANGS: info["lang"]="ru"
     return info
 def tr(uid,key):
-    lang=get_user(uid).get("lang","be")
-    if lang not in LANGS: lang="be"
-    return LANGS[lang].get(key,key)
+    lang=get_user(uid).get("lang","ru")
+    return LANGS.get(lang, LANGS["ru"]).get(key,key)
 
+# ===== 1. OPEN-METEO =====
+def fetch_openmeteo(lat,lon):
+    url=f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset,uv_index_max,wind_speed_10m_max,wind_gusts_10m_max&hourly=temperature_2m,precipitation_probability&timezone=auto&forecast_days=7&wind_speed_unit=ms"
+    r=requests.get(url,timeout=12).json()
+    if "current" in r:
+        r["_source"]="open-meteo"
+        return r
+    print("OPEN-METEO FAIL:", r)
+    return None
+
+# ===== 2. WEATHERAPI =====
+def fetch_weatherapi(lat,lon):
+    if not WAPI_KEY:
+        print("NO WAPI_KEY")
+        return None
+    try:
+        url=f"https://api.weatherapi.com/v1/forecast.json?key={WAPI_KEY}&q={lat},{lon}&days=7&aqi=yes&alerts=yes"
+        j=requests.get(url,timeout=12).json()
+        if "error" in j:
+            print("WEATHERAPI ERROR:", j)
+            return None
+        # конвертим в формат open-meteo чтобы не переписывать весь код
+        cur=j["current"]
+        fore=j["forecast"]["forecastday"]
+        daily={
+            "time":[d["date"] for d in fore],
+            "temperature_2m_max":[d["day"]["maxtemp_c"] for d in fore],
+            "temperature_2m_min":[d["day"]["mintemp_c"] for d in fore],
+            "precipitation_probability_max":[d["day"]["daily_chance_of_rain"] for d in fore],
+            "precipitation_sum":[d["day"]["totalprecip_mm"] for d in fore],
+            "sunrise":[d["astro"]["sunrise"] for d in fore],
+            "sunset":[d["astro"]["sunset"] for d in fore],
+            "uv_index_max":[d["day"]["uv"] for d in fore],
+            "wind_speed_10m_max":[round(d["day"]["maxwind_kph"]/3.6,1) for d in fore],
+            "wind_gusts_10m_max":[round(d["day"]["maxwind_kph"]/3.6,1) for d in fore],
+        }
+        # hourly - берем первые 24 часа из сегодня
+        hourly_times=[]
+        hourly_temp=[]
+        hourly_prec=[]
+        for h in fore[0]["hour"]:
+            hourly_times.append(h["time"])
+            hourly_temp.append(h["temp_c"])
+            hourly_prec.append(h["chance_of_rain"])
+        converted={
+            "current":{
+                "temperature_2m":cur["temp_c"],
+                "apparent_temperature":cur["feelslike_c"],
+                "relative_humidity_2m":cur["humidity"],
+                "wind_speed_10m":round(cur["wind_kph"]/3.6,1) # в м/с
+            },
+            "daily":daily,
+            "hourly":{
+                "time":hourly_times,
+                "temperature_2m":hourly_temp,
+                "precipitation_probability":hourly_prec
+            },
+            "timezone":j["location"]["tz_id"],
+            "_source":"weatherapi"
+        }
+        return converted
+    except Exception as e:
+        print("WAPI EXC:", e)
+        return None
+
+# ===== ГИБРИД С ФОЛБЭКОМ =====
 def get_w(lat,lon):
-    # ПОЧИНЕНО: 2 попытки, вторая без wind_speed_unit
-    try:
-        url=f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset,uv_index_max,wind_speed_10m_max,wind_gusts_10m_max&hourly=temperature_2m,precipitation_probability&timezone=auto&forecast_days=7&wind_speed_unit=ms"
-        r=requests.get(url,timeout=15)
-        j=r.json()
-        if "current" in j:
-            return j
-        print("API FAIL 1:", j)
-    except Exception as e:
-        print("REQ ERR 1:", e)
+    key=f"{round(lat,2)}_{round(lon,2)}"
+    now_ts=time.time()
+    if key in CACHE and now_ts - CACHE[key][0] < CACHE_TTL:
+        return CACHE[key][1]
 
-    # запасной запрос без ms
+    # пробуем open-meteo первым
+    data=fetch_openmeteo(lat,lon)
+    if data:
+        CACHE[key]=(now_ts,data)
+        return data
+
+    print("Open-Meteo limit - переключаюсь на WeatherAPI")
+    data=fetch_weatherapi(lat,lon)
+    if data:
+        CACHE[key]=(now_ts,data)
+        return data
+
+    # если и weatherapi упал - пробуем еще раз open-meteo без ms (на случай глюка)
+    print("WeatherAPI тоже упал - пробую снова Open-Meteo без ms")
     try:
-        url2=f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset,uv_index_max,wind_speed_10m_max,wind_gusts_10m_max&hourly=temperature_2m,precipitation_probability&timezone=auto&forecast_days=7"
-        r2=requests.get(url2,timeout=15)
-        j2=r2.json()
-        print("FALLBACK:", j2.keys())
-        return j2
-    except Exception as e:
-        print("REQ ERR 2:", e)
-        return {}
+        url=f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset,uv_index_max,wind_speed_10m_max,wind_gusts_10m_max&hourly=temperature_2m,precipitation_probability&timezone=auto&forecast_days=7"
+        r=requests.get(url,timeout=12).json()
+        if "current" in r:
+            r["_source"]="open-meteo-fallback"
+            CACHE[key]=(now_ts,r)
+            return r
+    except:
+        pass
+    return {"error":True,"reason":"both apis failed"}
 
 def main_kb(uid):
     k=types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -204,7 +395,7 @@ def do_cmd(chat_id, uid, cmd):
             bot.send_message(chat_id, "🌐 Выбери язык / Choose language / Изабери језик:", reply_markup=lang_kb())
             return
         if cmd=="start":
-            L=LANGS.get(get_user(uid).get("lang","ru"),LANGS["ru"])
+            L=LANGS.get(get_user(uid).get("lang","ru"), LANGS["ru"])
             bot.send_message(chat_id, L["welcome"], reply_markup=main_kb(uid))
             return
         if cmd=="language":
@@ -220,29 +411,31 @@ def do_cmd(chat_id, uid, cmd):
         loc=get_user(uid)
         w=get_w(loc["lat"],loc["lon"])
         if not w or "current" not in w:
-            bot.send_message(chat_id, f"Open-Meteo не отвечает, попробуй еще раз /current. Debug: {str(w)[:300]}")
+            bot.send_message(chat_id, "⏳ Оба сервиса заняты, подожди минуту. Кэш уже включен чтобы не банило.")
             return
+
         c=w["current"]; d=w["daily"]
-        L=LANGS.get(get_user(uid).get("lang","ru"),LANGS["ru"])
-        # конверт в м/с если пришло в км/ч
-        wind_ms = c['wind_speed_10m']
-        # если больше 20 - значит км/ч, делим
-        if wind_ms > 30:
-            wind_ms = round(wind_ms / 3.6, 1)
+        L=LANGS.get(get_user(uid).get("lang","ru"), LANGS["ru"])
+        src=w.get("_source","")
+        src_icon="☁️" if "weatherapi" in src else "🌐"
 
         txt=""
-        if cmd=="current": txt=f"📍 {L['now_txt']} {loc['timezone']}\n\n🌡 {c['temperature_2m']}°C\n{L['feels_txt']}: {c['apparent_temperature']}°C\n{L['humidity_txt']}: {c['relative_humidity_2m']}%\n{L['wind_txt']}: {wind_ms} м/с"
+        if cmd=="current": txt=f"{src_icon} {L['now_txt']} {loc['timezone']}\n\n🌡 {c['temperature_2m']}°C\n{L['feels_txt']}: {c['apparent_temperature']}°C\n{L['humidity_txt']}: {c['relative_humidity_2m']}%\n{L['wind_txt']}: {c['wind_speed_10m']} м/с"
         elif cmd=="today": txt=f"📅 {L['today_txt']} {d['time'][0]} {d['temperature_2m_max'][0]}/{d['temperature_2m_min'][0]}°C {L['rain_txt']} {d['precipitation_probability_max'][0]}%"
         elif cmd=="tomorrow": txt=f"➡️ {L['tomorrow_txt']} {d['time'][1]} {d['temperature_2m_max'][1]}/{d['temperature_2m_min'][1]}°C"
         elif cmd=="week":
             txt=f"📆 {L['week_txt']}\n"
-            for i in range(7): txt+=f"{d['time'][i]} {d['temperature_2m_min'][i]}/{d['temperature_2m_max'][i]}°C {d['precipitation_probability_max'][i]}%\n"
+            for i in range(min(7,len(d['time']))): txt+=f"{d['time'][i]} {d['temperature_2m_min'][i]}/{d['temperature_2m_max'][i]}°C {d['precipitation_probability_max'][i]}%\n"
         elif cmd=="hourly":
             h=w["hourly"]; txt="⏰\n"
-            for i in range(12): txt+=f"{h['time'][i][11:]} {h['temperature_2m'][i]}°C {h['precipitation_probability'][i]}%\n"
+            for i in range(min(12,len(h['time']))):
+                t=h['time'][i]
+                if " " in t: t=t.split()[1]
+                else: t=t[11:] if len(t)>11 else t
+                txt+=f"{t} {h['temperature_2m'][i]}°C {h['precipitation_probability'][i]}%\n"
         elif cmd=="rain": txt=f"🌧 {L['rain_txt']} {d['precipitation_probability_max'][0]}% {d['precipitation_sum'][0]}мм"
-        elif cmd=="wind": txt=f"💨 {L['wind_txt']}: {wind_ms} м/с\nПорывы: {d['wind_gusts_10m_max'][0]} м/с\nМакс: {d['wind_speed_10m_max'][0]} м/с"
-        elif cmd=="sun": txt=f"🌅 {L['rise_txt']}: {d['sunrise'][0][11:]}\n🌇 {L['set_txt']}: {d['sunset'][0][11:]}"
+        elif cmd=="wind": txt=f"💨 {L['wind_txt']}: {c['wind_speed_10m']} м/с\nПорывы: {d['wind_gusts_10m_max'][0]} м/с"
+        elif cmd=="sun": txt=f"🌅 {L['rise_txt']}: {d['sunrise'][0]}\n🌇 {L['set_txt']}: {d['sunset'][0]}"
         elif cmd=="uv": txt=f"☀️ UV {d['uv_index_max'][0]}"
         elif cmd=="air": txt="🌿 Воздух — скоро"
         elif cmd=="alerts": txt="⚠️ Нет тревог"
@@ -264,9 +457,14 @@ def all_commands(m):
 
 @bot.message_handler(content_types=["location"])
 def loc_h(m):
-    w=get_w(m.location.latitude,m.location.longitude)
-    tz=w.get("timezone","Europe/Belgrade") if w else "Europe/Belgrade"
+    # не дергаем API при получении локации - просто сохраняем, кэш сам обновится при первой команде
     uid=str(m.from_user.id)
+    # пытаемся узнать таймзону без тяжелого запроса
+    try:
+        w=fetch_openmeteo(m.location.latitude,m.location.longitude)
+        tz=w.get("timezone","Europe/Belgrade") if w else "Europe/Belgrade"
+    except:
+        tz="Europe/Belgrade"
     cur=get_user(m.from_user.id)
     cur.update({"lat":m.location.latitude,"lon":m.location.longitude,"timezone":tz})
     U[uid]=cur
@@ -310,7 +508,7 @@ def btn_h(m):
 app=Flask(__name__)
 @app.route("/")
 def home():
-    return "FIXED API ERROR FALLBACK"
+    return "HYBRID OPEN-METEO + WEATHERAPI + CACHE + ALL WELCOMES"
 def run_web():
     app.run(host="0.0.0.0",port=10000)
 threading.Thread(target=run_web,daemon=True).start()
